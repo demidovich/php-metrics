@@ -1,0 +1,56 @@
+version: "3"
+services:
+
+  nginx:
+    build:
+      context: ./
+      dockerfile: docker/app/nginx.Dockerfile
+      args:
+        UID: 1000
+        GID: 1000
+    image: "${APP_NAME:-noname}-nginx-dev"
+    container_name: "${APP_NAME:-noname}-nginx-dev"
+    ports:
+      - "${APP_PORT:-8080}:8080"
+    volumes:
+      - ./php:/app
+    networks:
+      - "docker_network"
+    links:
+      - php-fpm
+    depends_on:
+      - php-fpm
+
+  php-fpm:
+    build:
+      context: ./
+      dockerfile: docker/app/php-fpm/7.4-ubuntu/php-fpm.Dockerfile
+      args:
+        UID: 1000
+        GID: 1000
+    image: "${APP_NAME:-noname}-php-fpm-dev"
+    container_name: "${APP_NAME:-noname}-php-fpm-dev"
+    volumes:
+      - ./php:/app
+    links:
+      - redis
+    networks:
+      - "docker_network"
+
+  redis:
+    build:
+      context: ./
+      dockerfile: docker/app/redis.Dockerfile
+      args:
+        UID: 1000
+        GID: 1000
+    image: "${APP_NAME:-noname}-redis-dev"
+    container_name: "${APP_NAME:-noname}-redis-dev"
+    volumes:
+      - ./docker/var/redis:/data
+    networks:
+      - "docker_network"
+
+networks:
+  docker_network:
+    driver: bridge
