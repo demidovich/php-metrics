@@ -1,7 +1,7 @@
 <?php
 
 use Metric\MyMetric;
-use Metric\MetricCollectorRegistry;
+use Metric\MetricRepository;
 use Psr\Log\LoggerInterface;
 
 define('APP_START_TIME', hrtime(true));
@@ -13,10 +13,15 @@ $metric = new MyMetric(APP_START_TIME, 'yazoo');
 // Initialization of the metrics storage layer
 // Metric can work without this functionality
 
+// if ($config['persist']) {
+//     $metric->initStorage(
+//         MetricRepository::fromConfig('in-memory', [], $metric, 'app');
+//     );
+// }
+
 if ($config['persist']) {
-    $metric->initStorage(
-        new MetricCollectorRegistry()
-    );
+    $storage = MetricStorage::fromConfig('in-memory', [], $metric);
+    $metric->initStorage($storage);
 }
 
 // Metrics can be logged

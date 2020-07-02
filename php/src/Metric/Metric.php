@@ -2,9 +2,7 @@
 
 namespace Metric;
 
-use Metric\MetricRepository;
-use Metric\MetricLogger;
-use Prometheus\CollectorRegistry;
+use Metric\MetricStorage;
 use Psr\Log\LoggerInterface;
 
 class Metric
@@ -31,6 +29,11 @@ class Metric
         $this->setMethodLabel('get');
         $this->setRouteLabel('none');
         $this->setStatusLabel(200);
+    }
+
+    public function namespace(): string
+    {
+        return $this->namespace;
     }
 
     public function setLabel(string $name, $value): void
@@ -106,15 +109,9 @@ class Metric
         return \memory_get_usage(false);
     }
 
-    public function initStorage(CollectorRegistry $registry): void
+    public function initStorage(MetricStorage $storage): void
     {
-        $repository = new MetricRepository(
-            $registry, 
-            $this, 
-            $this->namespace
-        );
-
-        register_shutdown_function([$repository, 'persist']);
+        register_shutdown_function([$storage, 'persist']);
     }
 
     public function initLogger(LoggerInterface $logger): void
