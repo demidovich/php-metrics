@@ -16,6 +16,7 @@ Thumbs.db
 /nbproject
 Homestead.json
 Homestead.yaml
+/docker-compose.yml
 
 .env
 .makeenv
