@@ -2,7 +2,6 @@
 
 namespace Metric;
 
-use Metric\MetricStorage;
 use Psr\Log\LoggerInterface;
 
 class Metric
@@ -107,20 +106,5 @@ class Metric
     public function memoryUsage(): int
     {
         return \memory_get_usage(false);
-    }
-
-    public function initStorage(MetricStorage $storage): void
-    {
-        register_shutdown_function([$storage, 'persist']);
-    }
-
-    public function initLogger(LoggerInterface $logger): void
-    {
-        register_shutdown_function(function() use ($logger) {
-            $logger->info('metric labels : '.print_r($this->labels(), true));
-            $logger->info('metric timers : '.print_r($this->timersInMilliseconds(), true));
-            $logger->info('metric memory : '.print_r($this->memoryUsage(), true));
-            $logger->info('metric counters : '.print_r($this->counters(), true));
-        });
     }
 }

@@ -8,20 +8,24 @@ use Prometheus\RenderTextFormat;
 use Prometheus\Storage\APC;
 use Prometheus\Storage\InMemory;
 use Prometheus\Storage\Redis;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 
 class MetricStorage
 {
     private $registry;
     private $metric;
+    private $logger;
 
     public function __construct(CollectorRegistry $registry, Metric $metric)
     {
         $this->registry = $registry;
-        $this->metric   = $metric;
+        $this->metric = $metric;
+
+        register_shutdown_function([$this, 'persist']);
     }
 
-    public static function fromConfig(string $adapter, array $redisConfig, Metric $metric): self
+    public static function create(string $adapter, array $redisConfig, Metric $metric): self
     {
         switch ($adapter) {
             case 'redis':
@@ -44,19 +48,23 @@ class MetricStorage
 
     private static function redisAdapter(array $config): Redis
     {
-        $config = [
+        $defaults = [
             'host' => '127.0.0.1',
             'port' => 6379,
             'password' => null,
-            'database' => (int) 1,
+            'database' => 1,
+            'timeout'  => 1,
+            'read_timeout' => 1,
             'persistent_connections' => false,
-            'timeout'  => 0.5,
-            'read_timeout' => 2,
-        ] + $config;
+        ];
 
-        return new Redis($config);
+        return new Redis($config + $defaults);
     }
 
+    public function debug(LoggerInterface $logger): void
+    {
+        $this->logger = $logger;
+    }
 
     public function persist(): void
     {
@@ -66,13 +74,20 @@ class MetricStorage
         $memory    = $this->metric->memoryUsage();
         $counters  = $this->metric->counters();
 
-        $this->persistMemoryUsage($namespace, $memory, $labels);
-        $this->persistTimers($namespace, $timers, $labels);
+        $this->persistMemoryUsage($namespace, $labels, $memory);
+        $this->persistTimers($namespace, $labels, $timers);
         $this->persistRequests($namespace, $labels);
         $this->persistCounters($namespace, $counters);
-    }
 
-    private function persistMemoryUsage(string $namespace, int $value, array $labels): void
+        if ($this->logger) {
+            $this->logger->info('metric labels : '   . print_r($labels, true));
+            $this->logger->info('metric timers : '   . print_r($timers, true));
+            $this->logger->info('metric memory : '   . print_r($memory, true));
+            $this->logger->info('metric counters : ' . print_r($counters, true));
+        }
+    }
+    
+    private function persistMemoryUsage(string $namespace, array $labels, int $value): void
     {
         $memoryUsage = $this->registry->getOrRegisterGauge(
             $namespace, 
@@ -96,7 +111,7 @@ class MetricStorage
         $requests->inc($labels);
     }
 
-    private function persistTimers(string $namespace, array $timers, array $labels): void
+    private function persistTimers(string $namespace, array $labels, array $timers): void
     {
         if (! $timers) {
             return;
