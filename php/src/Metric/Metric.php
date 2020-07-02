@@ -83,7 +83,12 @@ class Metric
         return $this->timer->values(1e-6);
     }
 
-    public function increaseCounter(string $counter, int $quantity = 1): void
+    public function counters(): array
+    {
+        return $this->counters;
+    }
+
+    public function incrCounter(string $counter, int $quantity = 1): void
     {
         if (! isset($this->counters[$counter])) {
             $this->counters[$counter] = 0;
@@ -115,10 +120,10 @@ class Metric
     public function initLogger(LoggerInterface $logger): void
     {
         register_shutdown_function(function() use ($logger) {
-            $logger->info('metric labels : '.print_r($this->labels, true));
-            $logger->info('metric timers : '.print_r($this->timers, true));
-            $logger->info('metric memory : '.print_r($this->memory, true));
-            $logger->info('metric counters : '.print_r($this->counters, true));
+            $logger->info('metric labels : '.print_r($this->labels(), true));
+            $logger->info('metric timers : '.print_r($this->timersInMilliseconds(), true));
+            $logger->info('metric memory : '.print_r($this->memoryUsage(), true));
+            $logger->info('metric counters : '.print_r($this->counters(), true));
         });
     }
 }

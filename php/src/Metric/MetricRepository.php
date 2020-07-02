@@ -11,7 +11,6 @@ class MetricRepository
     private $registry;
     private $namespace;
     private $metric;
-    private $logger;
 
     public function __construct(CollectorRegistry $registry, Metric $metric, string $namespace = 'app')
     {
@@ -23,7 +22,7 @@ class MetricRepository
     public function persist(): void
     {
         $labels   = $this->metric->labels();
-        $timers   = $this->metric->timers();
+        $timers   = $this->metric->timersInSeconds();
         $memory   = $this->metric->memoryUsage();
         $counters = $this->metric->counters();
 

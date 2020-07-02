@@ -40,6 +40,18 @@ class MetricTimer
         $this->timerStartedAt = $finishedAt;
     }
 
+    /**
+     * Stop active timer
+     * @return int
+     */
+    private function stop(): int
+    {
+        $time = hrtime(true);
+        $this->timers[$this->timer] += ($time - $this->timerStartedAt);
+
+        return $time;
+    }
+
     public function spent(string $timer, int $nanoseconds): void
     {
         if ($this->phpInitComplete()) {
@@ -58,18 +70,6 @@ class MetricTimer
     private function phpInitComplete(): bool
     {
         return $this->timer !== self::RUNTIME_PHP_INIT;
-    }
-
-    /**
-     * Stop active timer
-     * @return int
-     */
-    private function stop(): int
-    {
-        $time = hrtime(true);
-        $this->timers[$this->timer] += ($time - $this->timerStartedAt);
-
-        return $time;
     }
 
     public function values(int $multiplier): array
