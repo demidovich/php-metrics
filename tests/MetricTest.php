@@ -71,4 +71,19 @@ class MetricTest extends TestCase
         $this->assertArrayHasKey('total', $timers);
         $this->assertEquals(3, round($timers['total'], 0));
     }
+
+    public function test_runtime_spent()
+    {
+        $metric = $this->metric();
+        $metric->startPhp();
+        usleep(5000);
+
+        $metric->spentMongo(1000);
+
+        $timers = $metric->timersInMilliseconds();
+
+        $this->assertArrayHasKey('mongo', $timers);
+        $this->assertEquals(4, round($timers['php'], 0));
+        $this->assertEquals(1, round($timers['mongo'], 0));
+    }
 }

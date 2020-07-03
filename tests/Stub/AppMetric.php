@@ -13,9 +13,9 @@ class AppMetric extends Metric
         $this->start('mongo');
     }
 
-    public function spentMongo(int $nanoseconds): void
+    public function spentMongo(int $microseconds): void
     {
-        $this->spent('mongo', $nanoseconds);
+        $this->spent('mongo', $microseconds * 1000);
     }
 
     public function loginAttemptEvent(): void
