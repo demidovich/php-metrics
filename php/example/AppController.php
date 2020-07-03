@@ -13,13 +13,13 @@ $metric = new MyMetric(APP_START_TIME, 'yazoo');
 // Initialization of the metrics storage layer
 // Metric can work without this functionality
 
-if ($config['persist']) {
+if ($yourAppConfig['metric_storage']) {
     $storage = MetricStorage::create('in-memory', [], $metric);
 }
 
 // Metrics can be logged
 
-if ($config['debug']) {
+if ($yourAppConfig['metric_log']) {
     $storage->debug(
         new LoggerInterface()
     );
