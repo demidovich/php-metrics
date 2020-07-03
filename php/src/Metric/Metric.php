@@ -6,10 +6,11 @@ use Psr\Log\LoggerInterface;
 
 class Metric
 {
+    protected $namespace = 'app';
+
     private $label;
     private $counters = [];
     private $timer;
-    private $namespace = 'app';
 
     /**
      * @param int $startTime Start time in nanoseconds
