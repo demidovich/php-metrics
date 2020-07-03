@@ -70,17 +70,17 @@ class Metrics
 
     public function startPhp(): void
     {
-        $this->runtime->start(Runtime::RUNTIME_PHP);
+        $this->runtime->start(Runtime::PHP);
     }
 
-    public function timersInSeconds(): array
+    public function timersInSeconds(int $precision = 5): array
     {
-        return $this->runtime->timers(1e9, 6);
+        return $this->runtime->timers(1e9, $precision);
     }
 
-    public function timersInMilliseconds(): array
+    public function timersInMilliseconds(int $precision = 2): array
     {
-        return $this->runtime->timers(1e6, 2);
+        return $this->runtime->timers(1e6, $precision);
     }
 
     public function counters(): array

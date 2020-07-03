@@ -76,13 +76,13 @@ class Runtime
         return $this->timer !== self::PHP_INIT;
     }
 
-    public function timers(int $divider, int $precesion): array
+    public function timers(int $divider, int $precision): array
     {
         $this->stop();
 
         $result = [];
         foreach ($this->timers as $name => $value) {
-            $result[$name] = \round($value / $divider, $precesion);
+            $result[$name] = \round($value / $divider, $precision);
         }
         
         $result['total'] = \array_sum($result);
