@@ -2,9 +2,6 @@
 
 namespace Metric;
 
-use Metric\MetricStorage;
-use Psr\Log\LoggerInterface;
-
 class Metric
 {
     protected $namespace = 'app';

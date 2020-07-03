@@ -3,7 +3,7 @@
 namespace Tests;
 
 use PHPUnit\Framework\TestCase;
-use Tests\AppMetric;
+use Tests\Stub\AppMetric;
 
 class MetricTest extends TestCase
 {
