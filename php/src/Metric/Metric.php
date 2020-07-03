@@ -9,16 +9,15 @@ class Metric
     private $label;
     private $counters = [];
     private $timer;
-    private $namespace;
+    private $namespace = 'app';
 
     /**
      * @param int $startTime Start time in nanoseconds
      */
-    public function __construct(int $startTime, string $namespace = 'app')
+    public function __construct(int $startTime)
     {
         $this->timer = new MetricTimer($startTime);
         $this->label = new MetricLabel();
-        $this->namespace = $namespace;
 
         $this->initLabels();
     }
