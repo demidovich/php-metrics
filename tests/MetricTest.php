@@ -18,14 +18,14 @@ class MetricTest extends TestCase
         return new AppMetric($startTime);
     }
 
-    public function test_metric_namespace()
+    public function test_namespace()
     {
         $metric = $this->metric();
 
         $this->assertEquals('myapp', $metric->namespace());
     }
 
-    public function test_metric_runtime_php_init()
+    public function test_runtime_php_init()
     {
         $metric = $this->metric(1000);
         $timers = $metric->timersInMilliseconds();
@@ -34,7 +34,7 @@ class MetricTest extends TestCase
         $this->assertEquals(1, round($timers['php_init'], 0));
     }
 
-    public function test_metric_runtime_php()
+    public function test_runtime_php()
     {
         $metric = $this->metric();
         $metric->startPhp();
@@ -46,7 +46,7 @@ class MetricTest extends TestCase
         $this->assertEquals(1, round($timers['php'], 0));
     }
 
-    public function test_metric_runtime_custom_timer()
+    public function test_runtime_custom_timer()
     {
         $metric = $this->metric();
         $metric->startMongo();
@@ -58,7 +58,7 @@ class MetricTest extends TestCase
         $this->assertEquals(1, round($timers['mongo'], 0));
     }
 
-    public function test_metric_runtime_total()
+    public function test_runtime_total()
     {
         $metric = $this->metric(1000);
         $metric->startPhp();
