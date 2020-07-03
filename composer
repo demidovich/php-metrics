@@ -2,4 +2,4 @@
 
 cd "$(dirname "$0")"
 
-docker-compose -f docker-compose.yml exec php-fpm composer $@
+docker-compose -f docker-compose.yml exec php composer $@

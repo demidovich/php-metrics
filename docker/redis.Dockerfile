@@ -9,7 +9,7 @@ RUN set -eux \
     && apk add --update --no-cache shadow \
     && rm -rf /var/cache/apk/* \
     && rm -rf /tmp/* \
-    && useradd -u ${UID} yazoo
+    && useradd -u ${UID} www-data
 
 USER $UID
 

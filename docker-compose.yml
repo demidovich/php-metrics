@@ -1,0 +1,34 @@
+version: "3"
+services:
+
+  php:
+    build:
+      context: ./
+      dockerfile: docker/php.Dockerfile
+      args:
+        UID: 1000
+        GID: 1000
+    image: "php-metric-php"
+    container_name: "php-metric-php"
+    volumes:
+      - ./:/app
+    links:
+      - redis
+    networks:
+      - "docker_network"
+
+  redis:
+    build:
+      context: ./
+      dockerfile: docker/redis.Dockerfile
+      args:
+        UID: 1000
+        GID: 1000
+    image: "php-metric-redis"
+    container_name: "php-metric-redis"
+    networks:
+      - "docker_network"
+
+networks:
+  docker_network:
+    driver: bridge
