@@ -25,6 +25,16 @@ class MetricsTest extends TestCase
         $this->assertEquals('myapp', $metric->namespace());
     }
 
+    public function test_memory_usage()
+    {
+        $metric = $this->metrics();
+
+        $expected = round(\memory_get_usage(false) / 10);
+        $actual   = round($metric->memoryUsage() / 10);
+
+        $this->assertEquals($expected, $actual);
+    }
+
     public function test_runtime_php_init()
     {
         $metric = $this->metrics(1000);
@@ -86,4 +96,6 @@ class MetricsTest extends TestCase
         $this->assertEquals(4, $timers['php']);
         $this->assertEquals(1, $timers['mongo']);
     }
+
+    
 }
