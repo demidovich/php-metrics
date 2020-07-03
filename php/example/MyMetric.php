@@ -1,14 +1,12 @@
 <?php
 
-namespace Metric;
-
 use Metric\Metric;
 
 class MyMetric extends Metric
 {
-    public function spentSql(int $nanoseconds): void
+    public function spentSql(int $microseconds): void
     {
-        $this->spent('sql', $nanoseconds);
+        $this->spent('sql', (int) $microseconds * 1000);
     }
 
     public function startRedis(): void
@@ -19,5 +17,10 @@ class MyMetric extends Metric
     public function startCall(): void
     {
         $this->start('call');
+    }
+
+    public function signilAttemptEvent(): void
+    {
+        $this->incrCounter('signin_attempt');
     }
 }
