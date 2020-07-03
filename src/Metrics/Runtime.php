@@ -2,10 +2,10 @@
 
 namespace Metrics;
 
-class Timers
+class Runtime
 {
-    const RUNTIME_PHP_INIT = 'php_init';
-    const RUNTIME_PHP = 'php';
+    const PHP_INIT = 'php_init';
+    const PHP = 'php';
 
     private $timer;
     private $timerStartedAt;
@@ -17,9 +17,10 @@ class Timers
      */
     public function __construct(int $startTime)
     {
-        $this->timer = self::RUNTIME_PHP_INIT;
+        $this->timer = self::PHP_INIT;
         $this->timerStartedAt = $startTime;
-        $this->timers[self::RUNTIME_PHP_INIT] = 0;
+
+        $this->timers[self::PHP_INIT] = 0;
     }
 
     /**
@@ -58,9 +59,9 @@ class Timers
     public function spent(string $timer, int $nanoseconds): void
     {
         if ($this->phpInitComplete()) {
-            $this->timers[self::RUNTIME_PHP] = $this->timers[self::RUNTIME_PHP] - $nanoseconds;
+            $this->timers[self::PHP] = $this->timers[self::PHP] - $nanoseconds;
         } else {
-            $this->timers[self::RUNTIME_PHP_INIT] = $this->timers[self::RUNTIME_PHP_INIT] - $nanoseconds;
+            $this->timers[self::PHP_INIT] = $this->timers[self::PHP_INIT] - $nanoseconds;
         }
 
         if (! isset($this->timers[$timer])) {
@@ -72,10 +73,10 @@ class Timers
 
     private function phpInitComplete(): bool
     {
-        return $this->timer !== self::RUNTIME_PHP_INIT;
+        return $this->timer !== self::PHP_INIT;
     }
 
-    public function values(int $divider, int $precesion): array
+    public function timers(int $divider, int $precesion): array
     {
         $this->stop();
 

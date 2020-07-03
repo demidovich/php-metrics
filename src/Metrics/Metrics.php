@@ -7,16 +7,16 @@ class Metrics
     protected $namespace = 'app';
 
     private $labels;
+    private $runtime;
     private $counters = [];
-    private $timers;
 
     /**
      * @param int $startTime Application start time in nanoseconds
      */
     public function __construct(int $startTime)
     {
-        $this->labels = new Labels();
-        $this->timers = new Timers($startTime);
+        $this->labels  = new Labels();
+        $this->runtime = new Runtime($startTime);
 
         $this->initLabels();
     }
@@ -60,27 +60,27 @@ class Metrics
 
     protected function start(string $timer): void
     {
-        $this->timers->start($timer);
+        $this->runtime->start($timer);
     }
 
     protected function spent(string $timer, int $nanoseconds): void
     {
-        $this->timers->spent($timer, $nanoseconds);
+        $this->runtime->spent($timer, $nanoseconds);
     }
 
     public function startPhp(): void
     {
-        $this->timers->start(Timers::RUNTIME_PHP);
+        $this->runtime->start(Runtime::RUNTIME_PHP);
     }
 
     public function timersInSeconds(): array
     {
-        return $this->timers->values(1e9, 6);
+        return $this->runtime->timers(1e9, 6);
     }
 
     public function timersInMilliseconds(): array
     {
-        return $this->timers->values(1e6, 2);
+        return $this->runtime->timers(1e6, 2);
     }
 
     public function counters(): array
