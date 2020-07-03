@@ -28,10 +28,10 @@ class MetricsTest extends TestCase
     public function test_runtime_php_init()
     {
         $metric = $this->metrics(1000);
-        $timers = $metric->timersInMilliseconds();
+        $timers = $metric->timersInMilliseconds(0);
 
         $this->assertArrayHasKey('php_init', $timers);
-        $this->assertEquals(1, round($timers['php_init'], 0));
+        $this->assertEquals(1, $timers['php_init']);
     }
 
     public function test_runtime_php()
@@ -40,10 +40,10 @@ class MetricsTest extends TestCase
         $metric->startPhp();
         usleep(1000);
 
-        $timers = $metric->timersInMilliseconds();
+        $timers = $metric->timersInMilliseconds(0);
 
         $this->assertArrayHasKey('php', $timers);
-        $this->assertEquals(1, round($timers['php'], 0));
+        $this->assertEquals(1, $timers['php']);
     }
 
     public function test_runtime_custom_timer()
@@ -52,10 +52,10 @@ class MetricsTest extends TestCase
         $metric->startMongo();
         usleep(1000);
 
-        $timers = $metric->timersInMilliseconds();
+        $timers = $metric->timersInMilliseconds(0);
 
         $this->assertArrayHasKey('mongo', $timers);
-        $this->assertEquals(1, round($timers['mongo'], 0));
+        $this->assertEquals(1, $timers['mongo']);
     }
 
     public function test_runtime_total()
@@ -66,10 +66,10 @@ class MetricsTest extends TestCase
         $metric->startMongo();
         usleep(1000);
 
-        $timers = $metric->timersInMilliseconds();
+        $timers = $metric->timersInMilliseconds(0);
 
         $this->assertArrayHasKey('total', $timers);
-        $this->assertEquals(3, round($timers['total'], 0));
+        $this->assertEquals(3, $timers['total']);
     }
 
     public function test_runtime_spent()
@@ -80,10 +80,10 @@ class MetricsTest extends TestCase
 
         $metric->spentMongo(1000);
 
-        $timers = $metric->timersInMilliseconds();
+        $timers = $metric->timersInMilliseconds(0);
 
         $this->assertArrayHasKey('mongo', $timers);
-        $this->assertEquals(4, round($timers['php'], 0));
-        $this->assertEquals(1, round($timers['mongo'], 0));
+        $this->assertEquals(4, $timers['php']);
+        $this->assertEquals(1, $timers['mongo']);
     }
 }
