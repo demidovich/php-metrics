@@ -77,12 +77,12 @@ class Metric
 
     public function timersInSeconds(): array
     {
-        return $this->timer->values(1e-9);
+        return $this->timer->values(1e9, 6);
     }
 
     public function timersInMilliseconds(): array
     {
-        return $this->timer->values(1e-6);
+        return $this->timer->values(1e6, 2);
     }
 
     public function counters(): array

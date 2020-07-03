@@ -12,6 +12,9 @@ class MetricTimer
 
     private $timers = [];
 
+    /**
+     * @param int $startTime Application start time in nanoseconds
+     */
     public function __construct(int $startTime)
     {
         $this->timer = self::RUNTIME_PHP_INIT;
@@ -72,14 +75,15 @@ class MetricTimer
         return $this->timer !== self::RUNTIME_PHP_INIT;
     }
 
-    public function values(int $multiplier): array
+    public function values(int $divider, int $precesion): array
     {
         $this->stop();
 
         $result = [];
         foreach ($this->timers as $name => $value) {
-            $result[$name] = \round($value * $multiplier, 5);
+            $result[$name] = \round($value / $divider, $precesion);
         }
+        
         $result['total'] = \array_sum($result);
 
         return $result;
