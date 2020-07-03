@@ -4,8 +4,8 @@ define('APP_START_TIME', hrtime(true));
 
 require __DIR__.'/../vendor/autoload.php';
 
-$metric = new MyMetric(APP_START_TIME);
-$storage = Metric\MetricStorage::create('in-memory', [], $metric);
+$metric = new MyMetrics(APP_START_TIME);
+$storage = Metrics\Storage::create('in-memory', [], $metric);
 
 // PHP initialization is complete.
 // Start of business logic 
@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_URI'] == '/metrics') {
     echo appHandler($metric);
 }
 
-function appHandler(Metric\MyMetric $metric)
+function appHandler(MyMetrics $metric)
 {
     // Register runtime for redis query
     $metric->startRedis();
@@ -42,12 +42,12 @@ function appHandler(Metric\MyMetric $metric)
     $metric->spentSql(10);
 
     // Register a business logic event
-    $metric->signilAttemptEvent();
+    $metric->signinAttemptEvent();
 
     // These times and events will be stored in register_shutdown_function()
 }
 
-function exportMetricsHandler(Metric\MetricStorage $storage)
+function exportMetricsHandler(Metrics\Storage $storage)
 {
     echo $storage->fetch();
 }

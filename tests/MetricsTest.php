@@ -3,11 +3,11 @@
 namespace Tests;
 
 use PHPUnit\Framework\TestCase;
-use Tests\Stub\AppMetric;
+use Tests\Stub\AppMetrics;
 
-class MetricTest extends TestCase
+class MetricsTest extends TestCase
 {
-    private function metric(int $initMicroseconds = null): AppMetric
+    private function metrics(int $initMicroseconds = null): AppMetrics
     {
         $startTime = hrtime(true);
 
@@ -15,19 +15,19 @@ class MetricTest extends TestCase
             usleep($initMicroseconds);
         }
 
-        return new AppMetric($startTime);
+        return new AppMetrics($startTime);
     }
 
     public function test_namespace()
     {
-        $metric = $this->metric();
+        $metric = $this->metrics();
 
         $this->assertEquals('myapp', $metric->namespace());
     }
 
     public function test_runtime_php_init()
     {
-        $metric = $this->metric(1000);
+        $metric = $this->metrics(1000);
         $timers = $metric->timersInMilliseconds();
 
         $this->assertArrayHasKey('php_init', $timers);
@@ -36,7 +36,7 @@ class MetricTest extends TestCase
 
     public function test_runtime_php()
     {
-        $metric = $this->metric();
+        $metric = $this->metrics();
         $metric->startPhp();
         usleep(1000);
 
@@ -48,7 +48,7 @@ class MetricTest extends TestCase
 
     public function test_runtime_custom_timer()
     {
-        $metric = $this->metric();
+        $metric = $this->metrics();
         $metric->startMongo();
         usleep(1000);
 
@@ -60,7 +60,7 @@ class MetricTest extends TestCase
 
     public function test_runtime_total()
     {
-        $metric = $this->metric(1000);
+        $metric = $this->metrics(1000);
         $metric->startPhp();
         usleep(1000);
         $metric->startMongo();
@@ -74,7 +74,7 @@ class MetricTest extends TestCase
 
     public function test_runtime_spent()
     {
-        $metric = $this->metric();
+        $metric = $this->metrics();
         $metric->startPhp();
         usleep(5000);
 

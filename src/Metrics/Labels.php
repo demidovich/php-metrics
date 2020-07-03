@@ -1,8 +1,8 @@
 <?php
 
-namespace Metric;
+namespace Metrics;
 
-class MetricLabel
+class Labels
 {
     private $keys   = [];
     private $labels = [];

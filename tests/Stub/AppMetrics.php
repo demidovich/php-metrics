@@ -2,9 +2,9 @@
 
 namespace Tests\Stub;
 
-use Metric\Metric;
+use Metrics\Metrics;
 
-class AppMetric extends Metric
+class AppMetrics extends Metrics
 {
     protected $namespace = "myapp";
 

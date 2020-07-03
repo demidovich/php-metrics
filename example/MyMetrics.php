@@ -1,8 +1,8 @@
 <?php
 
-use Metric\Metric;
+use Metrics\Metrics;
 
-class MyMetric extends Metric
+class MyMetrics extends Metrics
 {
     public function spentSql(int $microseconds): void
     {
@@ -19,7 +19,7 @@ class MyMetric extends Metric
         $this->start('call');
     }
 
-    public function signilAttemptEvent(): void
+    public function signinAttemptEvent(): void
     {
         $this->incrCounter('signin_attempt');
     }

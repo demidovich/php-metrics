@@ -1,8 +1,8 @@
 <?php
 
-namespace Metric;
+namespace Metrics;
 
-use Metric\Metric;
+use Metrics\Metrics;
 use Prometheus\CollectorRegistry;
 use Prometheus\RenderTextFormat;
 use Prometheus\Storage\APC;
@@ -11,13 +11,13 @@ use Prometheus\Storage\Redis;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
-class MetricStorage
+class Storage
 {
     private $registry;
     private $metric;
     private $logger;
 
-    public function __construct(CollectorRegistry $registry, Metric $metric)
+    public function __construct(CollectorRegistry $registry, Metrics $metric)
     {
         $this->registry = $registry;
         $this->metric = $metric;
@@ -25,7 +25,7 @@ class MetricStorage
         register_shutdown_function([$this, 'persist']);
     }
 
-    public static function create(string $adapter, array $redisConfig, Metric $metric): self
+    public static function create(string $adapter, array $redisConfig, Metrics $metric): self
     {
         switch ($adapter) {
             case 'redis':
@@ -152,7 +152,7 @@ class MetricStorage
     
     public function fetch(): string
     {
-        $samples = $this->registry->getMetricFamilySamples();
+        $samples = $this->registry->getMetricsFamilySamples();
 
         return (new RenderTextFormat())->render($samples);
     }

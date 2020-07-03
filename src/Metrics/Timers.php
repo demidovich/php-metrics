@@ -1,11 +1,11 @@
 <?php
 
-namespace Metric;
+namespace Metrics;
 
-class MetricTimer
+class Timers
 {
-    public const RUNTIME_PHP_INIT = 'php_init';
-    public const RUNTIME_PHP = 'php';
+    const RUNTIME_PHP_INIT = 'php_init';
+    const RUNTIME_PHP = 'php';
 
     private $timer;
     private $timerStartedAt;

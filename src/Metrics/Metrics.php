@@ -1,22 +1,22 @@
 <?php
 
-namespace Metric;
+namespace Metrics;
 
-class Metric
+class Metrics
 {
     protected $namespace = 'app';
 
-    private $label;
+    private $labels;
     private $counters = [];
-    private $timer;
+    private $timers;
 
     /**
-     * @param int $startTime Start time in nanoseconds
+     * @param int $startTime Application start time in nanoseconds
      */
     public function __construct(int $startTime)
     {
-        $this->timer = new MetricTimer($startTime);
-        $this->label = new MetricLabel();
+        $this->labels = new Labels();
+        $this->timers = new Timers($startTime);
 
         $this->initLabels();
     }
@@ -33,54 +33,54 @@ class Metric
         return $this->namespace;
     }
 
-    public function setLabel(string $name, $value): void
+    protected function setLabel(string $name, $value): void
     {
-        $this->label->set($name, $value);
+        $this->labels->set($name, $value);
     }
 
     public function setMethodLabel(string $method): void
     {
-        $this->label->set('method', $method);
+        $this->labels->set('method', $method);
     }
 
     public function setRouteLabel(string $route): void
     {
-        $this->label->set('route', $route);
+        $this->labels->set('route', $route);
     }
 
     public function setStatusLabel(int $status): void
     {
-        $this->label->set('status', $status);
+        $this->labels->set('status', $status);
     }
 
     public function labels(): array
     {
-        return $this->label->all();
+        return $this->labels->all();
     }
 
     protected function start(string $timer): void
     {
-        $this->timer->start($timer);
+        $this->timers->start($timer);
     }
 
     protected function spent(string $timer, int $nanoseconds): void
     {
-        $this->timer->spent($timer, $nanoseconds);
+        $this->timers->spent($timer, $nanoseconds);
     }
 
     public function startPhp(): void
     {
-        $this->timer->start(MetricTimer::RUNTIME_PHP);
+        $this->timers->start(Timers::RUNTIME_PHP);
     }
 
     public function timersInSeconds(): array
     {
-        return $this->timer->values(1e9, 6);
+        return $this->timers->values(1e9, 6);
     }
 
     public function timersInMilliseconds(): array
     {
-        return $this->timer->values(1e6, 2);
+        return $this->timers->values(1e6, 2);
     }
 
     public function counters(): array
