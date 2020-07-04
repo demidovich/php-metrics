@@ -1,5 +1,8 @@
 <?php
 
+apc_clear_cache();
+apc_clear_cache('user');
+
 $file = __DIR__.'/../vendor/autoload.php';
 
 if (! file_exists($file)) {

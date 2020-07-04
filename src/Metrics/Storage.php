@@ -25,6 +25,13 @@ class Storage
         register_shutdown_function([$this, 'persist']);
     }
 
+    /**
+     * @param string $adapter in-memory, apc, redis
+     * @param array $redisConfig
+     * @param Metrics $metrics
+     * @return \self
+     * @throws RuntimeException
+     */
     public static function create(string $adapter, array $redisConfig, Metrics $metrics): self
     {
         switch ($adapter) {
@@ -38,7 +45,7 @@ class Storage
                 $adapter = new InMemory();
                 break;
             default :
-                throw new RuntimeException("Invalid CollectorRegistry adapter name. Correct values: apc, in-memody, redis");
+                throw new RuntimeException("Invalid CollectorRegistry adapter \"$adapter\". Correct values: apc, in-memory, redis");
         }
 
         $registry = new CollectorRegistry($adapter);
@@ -144,7 +151,7 @@ class Storage
             if ($value) {
                 $counter = $this->registry->getOrRegisterCounter(
                     $namespace, 
-                    "quantity_{$name}_total", 
+                    "{$name}_total", 
                     "Count of {$name}"
                 );
                 $counter->incBy($value);
@@ -154,7 +161,7 @@ class Storage
     
     public function fetch(): string
     {
-        $samples = $this->registry->getMetricsFamilySamples();
+        $samples = $this->registry->getMetricFamilySamples();
 
         return (new RenderTextFormat())->render($samples);
     }
