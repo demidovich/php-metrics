@@ -1,5 +1,5 @@
 {
-    "name": "demidovich/php-metric",
+    "name": "demidovich/php-metrics",
     "license": "MIT",
     "type": "library",
     "description": "Prometheus metrics wrapper for the framework agnostic PHP applications.",
