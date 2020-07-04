@@ -1,7 +1,6 @@
 <?php
 
-apc_clear_cache();
-apc_clear_cache('user');
+apcu_clear_cache();
 
 $file = __DIR__.'/../vendor/autoload.php';
 
