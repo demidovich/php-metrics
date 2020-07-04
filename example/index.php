@@ -4,7 +4,12 @@ define('APP_START_TIME', hrtime(true));
 
 require __DIR__.'/../vendor/autoload.php';
 
-$metric = new MyMetrics(APP_START_TIME);
+$metric = new MyMetrics(APP_START_TIME, [
+    'route'  => 'my-route',
+    'method' => 'get',
+    'host'   => '10.0.0.1',
+]);
+
 $storage = Metrics\Storage::create('in-memory', [], $metric);
 
 // PHP initialization is complete.
@@ -21,30 +26,31 @@ function appHandler(MyMetrics $metric)
 {
     // Register runtime for redis query
     $metric->startRedis();
-    usleep(10);
+    usleep(1000);
 
     // Some business logic
     $metric->startPhp();
-    usleep(10);
+    usleep(1000);
 
-    // Register runtime for external call
-    $metric->startCall();
-    usleep(10);
+    // Register runtime for remote call
+    $metric->startRemoteCall();
+    usleep(1000);
 
     // Some business logic
     $metric->startPhp();
-    usleep(100);
+    usleep(1000);
 
     // Adding the spent time
     // E.g. inside the database query event
-    // These 10 microseconds will be subtracted from the 100 microseconds 
+    // These 500 microseconds will be subtracted from the 1000 microseconds 
     // of the current php tracking
-    $metric->spentSql(10);
+    $metric->spentSql(500);
 
     // Register a business logic event
-    $metric->signinAttemptEvent();
+    $metric->registerSigninAttempt();
 
-    // These times and events will be stored in register_shutdown_function()
+    // If Metrics\Storage has been initialized all metrics will be persisted 
+    // with register_shutdown_function()
 }
 
 function exportMetricsHandler(Metrics\Storage $storage)

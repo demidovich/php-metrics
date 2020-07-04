@@ -2,25 +2,30 @@
 
 use Metrics\Metrics;
 
+/**
+ * Wrappers of your counters and timers
+ */
 class MyMetrics extends Metrics
 {
+    protected $namespace = 'myapp';
+
     public function spentSql(int $microseconds): void
     {
-        $this->spent('sql', (int) $microseconds * 1000);
+        $this->runtime()->spent('sql', (int) $microseconds * 1000);
     }
 
     public function startRedis(): void
     {
-        $this->start('redis');
+        $this->runtime()->start('redis');
     }
 
-    public function startCall(): void
+    public function startRemoteCall(): void
     {
-        $this->start('call');
+        $this->runtime()->start('remote_call');
     }
 
-    public function signinAttemptEvent(): void
+    public function registerSigninAttempt(): void
     {
-        $this->incrCounter('signin_attempt');
+        $this->counters()->increase('signin_attempt');
     }
 }

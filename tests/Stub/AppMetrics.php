@@ -10,21 +10,21 @@ class AppMetrics extends Metrics
 
     public function startMongo(): void
     {
-        $this->start('mongo');
+        $this->runtime()->start('mongo');
     }
 
     public function spentMongo(int $microseconds): void
     {
-        $this->spent('mongo', $microseconds * 1000);
+        $this->runtime()->spent('mongo', $microseconds * 1000);
     }
 
-    public function loginAttemptEvent(): void
+    public function registerSigninAttempt(int $quantity = 1): void
     {
-        $this->incrCounter('login-attempt');
+        $this->counters()->increase('signin_attempt', $quantity);
     }
 
-    public function loginSuccessEvent(): void
+    public function registerSigninSuccess(): void
     {
-        $this->incrCounter('login-success');
+        $this->counters()->increase('signin_success');
     }
 }

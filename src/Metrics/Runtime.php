@@ -76,7 +76,17 @@ class Runtime
         return $this->timer !== self::PHP_INIT;
     }
 
-    public function timers(int $divider, int $precision): array
+    public function allInSeconds(int $precision = 6): array
+    {
+        return $this->timers(1e9, $precision);
+    }
+
+    public function allInMilliseconds(int $precision = 2): array
+    {
+        return $this->timers(1e6, $precision);
+    }
+
+    private function timers(int $divider, int $precision): array
     {
         $this->stop();
 

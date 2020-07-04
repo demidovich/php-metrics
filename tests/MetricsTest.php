@@ -7,7 +7,7 @@ use Tests\Stub\AppMetrics;
 
 class MetricsTest extends TestCase
 {
-    private function metrics(int $initMicroseconds = null): AppMetrics
+    private function metrics(int $initMicroseconds = null, array $labels = []): AppMetrics
     {
         $startTime = hrtime(true);
 
@@ -15,7 +15,7 @@ class MetricsTest extends TestCase
             usleep($initMicroseconds);
         }
 
-        return new AppMetrics($startTime);
+        return new AppMetrics($startTime, $labels);
     }
 
     public function test_namespace()
@@ -23,6 +23,23 @@ class MetricsTest extends TestCase
         $metric = $this->metrics();
 
         $this->assertEquals('myapp', $metric->namespace());
+    }
+
+    public function test_labels()
+    {
+        $initLabels = [
+            'route'  => 'my.route',
+            'method' => 'get',
+        ];
+
+        $metric = $this->metrics(null, $initLabels);
+        $labels = $metric->labels()->all();
+
+        $this->assertArrayHasKey('route', $labels);
+        $this->assertArrayHasKey('method', $labels);
+
+        $this->assertEquals($initLabels['route'], $labels['route']);
+        $this->assertEquals($initLabels['method'], $labels['method']);
     }
 
     public function test_memory_usage()
@@ -38,7 +55,7 @@ class MetricsTest extends TestCase
     public function test_runtime_php_init()
     {
         $metric = $this->metrics(1000);
-        $timers = $metric->timersInMilliseconds(0);
+        $timers = $metric->runtime()->allInMilliseconds(0);
 
         $this->assertArrayHasKey('php_init', $timers);
         $this->assertEquals(1, $timers['php_init']);
@@ -50,7 +67,7 @@ class MetricsTest extends TestCase
         $metric->startPhp();
         usleep(1000);
 
-        $timers = $metric->timersInMilliseconds(0);
+        $timers = $metric->runtime()->allInMilliseconds(0);
 
         $this->assertArrayHasKey('php', $timers);
         $this->assertEquals(1, $timers['php']);
@@ -62,7 +79,7 @@ class MetricsTest extends TestCase
         $metric->startMongo();
         usleep(1000);
 
-        $timers = $metric->timersInMilliseconds(0);
+        $timers = $metric->runtime()->allInMilliseconds(0);
 
         $this->assertArrayHasKey('mongo', $timers);
         $this->assertEquals(1, $timers['mongo']);
@@ -76,7 +93,7 @@ class MetricsTest extends TestCase
         $metric->startMongo();
         usleep(1000);
 
-        $timers = $metric->timersInMilliseconds(0);
+        $timers = $metric->runtime()->allInMilliseconds(0);
 
         $this->assertArrayHasKey('total', $timers);
         $this->assertEquals(3, $timers['total']);
@@ -90,12 +107,32 @@ class MetricsTest extends TestCase
 
         $metric->spentMongo(1000);
 
-        $timers = $metric->timersInMilliseconds(0);
+        $timers = $metric->runtime()->allInMilliseconds(0);
 
         $this->assertArrayHasKey('mongo', $timers);
         $this->assertEquals(4, $timers['php']);
         $this->assertEquals(1, $timers['mongo']);
     }
 
-    
+    public function test_event_counter()
+    {
+        $metric = $this->metrics();
+        $metric->registerSigninAttempt();
+
+        $couners = $metric->counters()->all();
+
+        $this->assertArrayHasKey('signin_attempt', $couners);
+        $this->assertEquals(1, $couners['signin_attempt']);
+    }
+
+    public function test_event_counter_increase5()
+    {
+        $metric = $this->metrics();
+        $metric->registerSigninAttempt(5);
+
+        $couners = $metric->counters()->all();
+
+        $this->assertArrayHasKey('signin_attempt', $couners);
+        $this->assertEquals(5, $couners['signin_attempt']);
+    }
 }

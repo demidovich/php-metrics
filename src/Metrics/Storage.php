@@ -14,18 +14,18 @@ use RuntimeException;
 class Storage
 {
     private $registry;
-    private $metric;
+    private $metrics;
     private $logger;
 
-    public function __construct(CollectorRegistry $registry, Metrics $metric)
+    public function __construct(CollectorRegistry $registry, Metrics $metrics)
     {
         $this->registry = $registry;
-        $this->metric = $metric;
+        $this->metrics  = $metrics;
 
         register_shutdown_function([$this, 'persist']);
     }
 
-    public static function create(string $adapter, array $redisConfig, Metrics $metric): self
+    public static function create(string $adapter, array $redisConfig, Metrics $metrics): self
     {
         switch ($adapter) {
             case 'redis':
@@ -43,7 +43,7 @@ class Storage
 
         $registry = new CollectorRegistry($adapter);
 
-        return new self($registry, $metric);
+        return new self($registry, $metrics);
     }
 
     private static function redisAdapter(array $config): Redis
@@ -68,22 +68,24 @@ class Storage
 
     public function persist(): void
     {
-        $namespace = $this->metric->namespace();
-        $labels    = $this->metric->labels();
-        $timers    = $this->metric->timersInSeconds();
-        $memory    = $this->metric->memoryUsage();
-        $counters  = $this->metric->counters();
+        $namespace = $this->metrics->namespace();
+        $memory    = $this->metrics->memoryUsage();
+        $labels    = $this->metrics->labels()->all();
+        $counters  = $this->metrics->counters()->all();
+        $timers    = $this->metrics->runtime()->allInSeconds();
 
-        $this->persistMemoryUsage($namespace, $labels, $memory);
-        $this->persistTimers($namespace, $labels, $timers);
         $this->persistRequests($namespace, $labels);
+        $this->persistMemoryUsage($namespace, $labels, $memory);
         $this->persistCounters($namespace, $counters);
+        $this->persistTimers($namespace, $labels, $timers);
 
         if ($this->logger) {
-            $this->logger->info('metric labels : '   . print_r($labels, true));
-            $this->logger->info('metric timers : '   . print_r($timers, true));
-            $this->logger->info('metric memory : '   . print_r($memory, true));
-            $this->logger->info('metric counters : ' . print_r($counters, true));
+            $this->logger->info('metrics');
+            $this->logger->info('namespace : ' . $namespace);
+            $this->logger->info('memory    : ' . round($memory / (1024 * 1024), 2) . 'Mb');
+            $this->logger->info('labels    : ' . print_r($labels, true));
+            $this->logger->info('timers    : ' . print_r($timers, true));
+            $this->logger->info('counters  : ' . print_r($counters, true));
         }
     }
     
