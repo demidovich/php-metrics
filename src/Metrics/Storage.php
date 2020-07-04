@@ -44,8 +44,10 @@ class Storage
             case 'in-memory':
                 $adapter = new InMemory();
                 break;
-            default :
-                throw new RuntimeException("Invalid CollectorRegistry adapter \"$adapter\". Correct values: apc, in-memory, redis");
+            default:
+                throw new RuntimeException(
+                    "Invalid CollectorRegistry adapter \"$adapter\". Correct values: apc, in-memory, redis"
+                );
         }
 
         $registry = new CollectorRegistry($adapter);
@@ -99,9 +101,9 @@ class Storage
     private function persistMemoryUsage(string $namespace, array $labels, int $value): void
     {
         $memoryUsage = $this->registry->getOrRegisterGauge(
-            $namespace, 
-            "http_memory_usage_total", 
-            "Memory usage of bytes", 
+            $namespace,
+            "http_memory_usage_total",
+            "Memory usage of bytes",
             array_keys($labels)
         );
 
@@ -111,9 +113,9 @@ class Storage
     private function persistRequests(string $namespace, array $labels): void
     {
         $requests = $this->registry->getOrRegisterCounter(
-            $namespace, 
-            'http_requests_total', 
-            'Total HTTP requests processed by the Yazoo', 
+            $namespace,
+            'http_requests_total',
+            'Total HTTP requests processed by the Yazoo',
             array_keys($labels)
         );
 
@@ -131,9 +133,9 @@ class Storage
         foreach ($timers as $name => $value) {
             if ($value) {
                 $timer = $this->registry->getOrRegisterGauge(
-                    $namespace, 
-                    "http_runtime_{$name}", 
-                    "{$name} runtime in microseconds", 
+                    $namespace,
+                    "http_runtime_{$name}",
+                    "{$name} runtime in microseconds",
                     $labelNames
                 );
                 $timer->set($value, $labels);
@@ -150,8 +152,8 @@ class Storage
         foreach ($counters as $name => $value) {
             if ($value) {
                 $counter = $this->registry->getOrRegisterCounter(
-                    $namespace, 
-                    "{$name}_total", 
+                    $namespace,
+                    "{$name}_total",
                     "Count of {$name}"
                 );
                 $counter->incBy($value);
