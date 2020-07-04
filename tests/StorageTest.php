@@ -33,9 +33,11 @@ class StorageTest extends TestCase
     {
         $metrics = $this->metrics();
 
+        $redisHost = isset($_SERVER['REDIS_HOST']) ? $_SERVER['REDIS_HOST'] : '127.0.0.1';
+
         $inmemory = Storage::create('in-memory', [], $metrics);
         $apc      = Storage::create('apc', [], $metrics);
-        $redis    = Storage::create('redis', ['host' => 'redis'], $metrics);
+        $redis    = Storage::create('redis', ['host' => $redisHost], $metrics);
 
         return [
             [$inmemory], // 0
