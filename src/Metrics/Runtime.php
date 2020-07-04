@@ -4,8 +4,8 @@ namespace Metrics;
 
 class Runtime
 {
-    const PHP_INIT = 'php_init';
-    const PHP = 'php';
+    public const PHP_INIT = 'php_init';
+    public const PHP = 'php';
 
     private $timer;
     private $timerStartedAt;

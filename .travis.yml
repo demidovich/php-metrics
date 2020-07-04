@@ -1,0 +1,33 @@
+sudo: false
+
+language: php
+
+php:
+  - 7.3
+
+before_install:
+  - sudo pip install codecov
+
+services:
+  - redis-server
+
+before_script:
+  - echo "apc.enabled = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - echo "apc.enable_cli = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - echo "extension = apcu.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - echo "extension = redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - composer self-update
+  - composer install --no-interaction --prefer-source --dev
+  - phpenv rehash
+
+script:
+  - vendor/bin/phpunit --verbose --colors --coverage-clover=coverage.xml
+
+branches:
+  only:
+  - master
+  - develop
+
+after_success:
+  - codecov
+

@@ -8,12 +8,14 @@ services:
       args:
         UID: 1000
         GID: 1000
-    image: "php-metric-php"
-    container_name: "php-metric-php"
+    image: "php-metrics-php"
+    container_name: "php-metrics-php"
     volumes:
       - ./:/app
     links:
       - redis
+    environment:
+      - REDIS_HOST=redis
     networks:
       - "docker_network"
 
@@ -24,8 +26,8 @@ services:
       args:
         UID: 1000
         GID: 1000
-    image: "php-metric-redis"
-    container_name: "php-metric-redis"
+    image: "php-metrics-redis"
+    container_name: "php-metrics-redis"
     networks:
       - "docker_network"
 
