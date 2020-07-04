@@ -5,6 +5,8 @@ ARG GID=82
 ENV UID=${UID:-82} \
     GID=${GID:-82}
 
+COPY ./docker/php/90-enable-apc-cli.ini /etc/php/7.4/cli/conf.d/
+
 RUN set -eux \
     && if [ $UID -ne 82 ]; then \
         usermod -u ${UID} www-data; \
