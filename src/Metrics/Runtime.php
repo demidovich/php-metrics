@@ -85,11 +85,6 @@ class Runtime
         $this->timers[$timer] += $nanoseconds;
     }
 
-    private function phpInitComplete(): bool
-    {
-        return $this->timer !== self::PHP_INIT;
-    }
-
     public function allInSeconds(int $precision = 6): array
     {
         return $this->timers(1e9, $precision);
