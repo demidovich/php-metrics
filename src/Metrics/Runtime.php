@@ -24,6 +24,22 @@ class Runtime
     }
 
     /**
+     * Active timer
+     */
+    public function timer(): string
+    {
+        return $this->timer;
+    }
+
+    /**
+     * Active timer start time
+     */
+    public function timerStartedAt()
+    {
+        return $this->timerStartedAt;
+    }
+
+    /**
      * Start the next timer
      * @param string $timer
      * @return void

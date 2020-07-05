@@ -85,6 +85,22 @@ class MetricsTest extends TestCase
         $this->assertEquals(1, $timers['mongo']);
     }
 
+    public function test_runtime_retry()
+    {
+        $metric = $this->metrics(1000);
+        $metric->startPhp();
+        usleep(1000);
+
+        $timer = $metric->runtime()->timer();
+        $startedAt = $metric->runtime()->timerStartedAt();
+
+        $metric->startPhp();
+        usleep(1000);
+
+        $this->assertEquals($timer,     $metric->runtime()->timer());
+        $this->assertEquals($startedAt, $metric->runtime()->timerStartedAt());
+    }
+
     public function test_runtime_total()
     {
         $metric = $this->metrics(1000);
