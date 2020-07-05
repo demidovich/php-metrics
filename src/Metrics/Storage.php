@@ -77,6 +77,8 @@ class Storage
 
     public function persist(): void
     {
+        $this->metrics->beforePersist();
+
         $namespace = $this->metrics->namespace();
         $memory    = $this->metrics->memoryUsage();
         $labels    = $this->metrics->labels()->all();
@@ -89,15 +91,19 @@ class Storage
         $this->persistTimers($namespace, $labels, $timers);
 
         if ($this->logger) {
-            $this->logger->info('metrics');
-            $this->logger->info('namespace : ' . $namespace);
-            $this->logger->info('memory    : ' . round($memory / (1024 * 1024), 2) . 'Mb');
-            $this->logger->info('labels    : ' . print_r($labels, true));
-            $this->logger->info('timers    : ' . print_r($timers, true));
-            $this->logger->info('counters  : ' . print_r($counters, true));
+            $debug  = PHP_EOL;
+            $debug .= "#" . PHP_EOL;
+            $debug .= "# {$namespace} metrics" . PHP_EOL;
+            $debug .= "#" . PHP_EOL;
+            $debug .= "memory: " . round($memory / (1024 * 1024), 2) . 'Mb' . PHP_EOL;
+            $debug .= "labels: " . print_r($labels, true) . PHP_EOL;
+            $debug .= "timers: " . print_r($timers, true) . PHP_EOL;
+            $debug .= "counters: " . print_r($counters, true) . PHP_EOL;
+            $debug .= PHP_EOL;
+            $this->logger->info($debug);
         }
     }
-    
+
     private function persistMemoryUsage(string $namespace, array $labels, int $value): void
     {
         $memoryUsage = $this->registry->getOrRegisterGauge(

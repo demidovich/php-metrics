@@ -106,26 +106,6 @@ class StorageTest extends TestCase
             ->method('info')
             ->with($this->stringContains('metrics'));
 
-        $logger->expects($this->at(1))
-            ->method('info')
-            ->with($this->stringContains('namespace'));
-
-        $logger->expects($this->at(2))
-            ->method('info')
-            ->with($this->stringContains('memory'));
-
-        $logger->expects($this->at(3))
-            ->method('info')
-            ->with($this->stringContains('labels'));
-
-        $logger->expects($this->at(4))
-            ->method('info')
-            ->with($this->stringContains('timers'));
-
-        $logger->expects($this->at(5))
-            ->method('info')
-            ->with($this->stringContains('counters'));
-
         $metrics = $this->metrics();
         $storage = Storage::create('in-memory', [], $metrics);
         $storage->debug($logger);

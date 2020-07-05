@@ -53,4 +53,13 @@ class Metrics
     {
         return \memory_get_usage(false);
     }
+
+    /**
+     * Called before persisting the metrics
+     * 
+     * @return void
+     */
+    public function beforePersist(): void
+    {
+    }
 }
