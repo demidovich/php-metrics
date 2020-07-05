@@ -23,13 +23,4 @@ class Labels
     {
         return $this->labels;
     }
-
-    public function keys(): array
-    {
-        if (! $this->keys) {
-            $this->keys = array_keys($this->labels);
-        }
-
-        return $this->keys;
-    }
 }
