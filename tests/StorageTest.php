@@ -35,14 +35,10 @@ class StorageTest extends TestCase
 
         $redisHost = isset($_SERVER['REDIS_HOST']) ? $_SERVER['REDIS_HOST'] : '127.0.0.1';
 
-        $inmemory = Storage::create('in-memory', [], $metrics);
-        $apc      = Storage::create('apc', [], $metrics);
-        $redis    = Storage::create('redis', ['host' => $redisHost], $metrics);
-
         return [
-            [$inmemory], // 0
-            [$apc],      // 1
-            [$redis],    // 2
+            'inmemory' => [Storage::create('in-memory', [], $metrics)],
+            'apc'      => [Storage::create('apc', [], $metrics)],
+            'redis'    => [Storage::create('redis', ['host' => $redisHost], $metrics)],
         ];
     }
 
@@ -53,6 +49,8 @@ class StorageTest extends TestCase
     {
         $storage->persist();
         $persisted = $storage->fetch();
+
+        $this->assertInstanceOf(Storage::class, $storage);
 
         $this->assertStringContainsString('route="myroute"', $persisted);
         $this->assertStringContainsString('method="get"',    $persisted);
