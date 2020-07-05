@@ -5,6 +5,8 @@ namespace Tests;
 use PHPUnit\Framework\TestCase;
 use Tests\Stub\AppMetrics;
 use Metrics\Storage;
+use Prometheus\CollectorRegistry;
+use Prometheus\Storage\InMemory;
 
 class StorageTest extends TestCase
 {
@@ -29,28 +31,51 @@ class StorageTest extends TestCase
         return $metrics;
     }
 
-    public function storages()
+    public function test_constructor()
     {
-        $metrics = $this->metrics();
+        $registry = new CollectorRegistry(
+            new InMemory()
+        );
 
-        $redisHost = isset($_SERVER['REDIS_HOST']) ? $_SERVER['REDIS_HOST'] : '127.0.0.1';
+        $storage = new Storage(
+            $registry,
+            $this->metrics()
+        );
 
-        return [
-            'inmemory' => [Storage::create('in-memory', [], $metrics)],
-            'apc'      => [Storage::create('apc', [], $metrics)],
-            'redis'    => [Storage::create('redis', ['host' => $redisHost], $metrics)],
-        ];
+        $this->asserts($storage);
     }
 
-    /**
-     * @dataProvider storages
-     */
-    public function test_inmemory(Storage $storage)
+    public function test_inmemory()
     {
+        $metrics = $this->metrics();
+        $storage = Storage::create('in-memory', [], $metrics);
+
+        $this->asserts($storage);
+    }
+
+    public function test_apc()
+    {
+        $metrics = $this->metrics();
+        $storage = Storage::create('apc', [], $metrics);
+
+        $this->asserts($storage);
+    }
+
+    public function test_redis()
+    {
+        $metrics = $this->metrics();
+        $host    = isset($_SERVER['REDIS_HOST']) ? $_SERVER['REDIS_HOST'] : '127.0.0.1';
+        $storage = Storage::create('redis', ['host' => $host], $metrics);
+
+        $this->asserts($storage);
+    }
+
+    private function asserts(Storage $storage)
+    {
+        $this->assertInstanceOf(Storage::class, $storage);
+
         $storage->persist();
         $persisted = $storage->fetch();
-
-        $this->assertInstanceOf(Storage::class, $storage);
 
         $this->assertStringContainsString('route="myroute"', $persisted);
         $this->assertStringContainsString('method="get"',    $persisted);
