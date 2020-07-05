@@ -24,6 +24,22 @@ class Runtime
     }
 
     /**
+     * Active timer
+     */
+    public function timer(): string
+    {
+        return $this->timer;
+    }
+
+    /**
+     * Active timer start time
+     */
+    public function timerStartedAt()
+    {
+        return $this->timerStartedAt;
+    }
+
+    /**
      * Start the next timer
      * @param string $timer
      * @return void
@@ -58,11 +74,9 @@ class Runtime
 
     public function spent(string $timer, int $nanoseconds): void
     {
-        if ($this->phpInitComplete()) {
-            $this->timers[self::PHP] = $this->timers[self::PHP] - $nanoseconds;
-        } else {
-            $this->timers[self::PHP_INIT] = $this->timers[self::PHP_INIT] - $nanoseconds;
-        }
+        $runningTimer = $this->timer;
+
+        $this->timers[$runningTimer] = $this->timers[$runningTimer] - $nanoseconds;
 
         if (! isset($this->timers[$timer])) {
             $this->timers[$timer] = 0;
