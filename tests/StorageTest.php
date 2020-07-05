@@ -7,6 +7,7 @@ use Tests\Stub\AppMetrics;
 use Metrics\Storage;
 use Prometheus\CollectorRegistry;
 use Prometheus\Storage\InMemory;
+use Psr\Log\LoggerInterface;
 
 class StorageTest extends TestCase
 {
@@ -70,6 +71,13 @@ class StorageTest extends TestCase
         $this->asserts($storage);
     }
 
+    public function test_invalid_adapter()
+    {
+        $this->expectExceptionMessageMatches("/^Invalid CollectorRegistry adapter/i");
+
+        Storage::create('incorrect-adapter', [], $this->metrics());
+    }
+
     private function asserts(Storage $storage)
     {
         $this->assertInstanceOf(Storage::class, $storage);
@@ -88,5 +96,40 @@ class StorageTest extends TestCase
         $this->assertStringContainsString('myapp_http_runtime_php_init',    $persisted);
         $this->assertStringContainsString('myapp_http_runtime_total',       $persisted);
         $this->assertStringContainsString('myapp_signin_attempt_total',     $persisted);
+    }
+
+    public function test_debug()
+    {
+        $logger = $this->createMock(LoggerInterface::class);
+
+        $logger->expects($this->at(0))
+            ->method('info')
+            ->with($this->stringContains('metrics'));
+
+        $logger->expects($this->at(1))
+            ->method('info')
+            ->with($this->stringContains('namespace'));
+
+        $logger->expects($this->at(2))
+            ->method('info')
+            ->with($this->stringContains('memory'));
+
+        $logger->expects($this->at(3))
+            ->method('info')
+            ->with($this->stringContains('labels'));
+
+        $logger->expects($this->at(4))
+            ->method('info')
+            ->with($this->stringContains('timers'));
+
+        $logger->expects($this->at(5))
+            ->method('info')
+            ->with($this->stringContains('counters'));
+
+        $metrics = $this->metrics();
+        $storage = Storage::create('in-memory', [], $metrics);
+        $storage->debug($logger);
+
+        $storage->persist();
     }
 }
