@@ -103,8 +103,6 @@ class Runtime
         foreach ($this->timers as $name => $value) {
             $result[$name] = \round($value / $divider, $precision);
         }
-        
-        $result['total'] = \array_sum($result);
 
         return $result;
     }

@@ -10,10 +10,19 @@ use Prometheus\Storage\InMemory;
 use Prometheus\Storage\Redis;
 use RuntimeException;
 
+/**
+ * Prometheus metrics:
+ * 
+ * app_http_requests_total          (route, method, labels)     count
+ * app_http_statuses_total          (route, status, labels)     count
+ * app_http_memory_usage_bytes      (route, labels)             bytes
+ * app_http_runtime_seconds_total   (route, labels)             seconds
+ * app_http_runtime_seconds         (route, timer, labels)      seconds
+ * app_signin_attempt_total         (lebels)                    count
+ */
 class Storage
 {
     private $registry;
-    private $logger;
 
     public function __construct(CollectorRegistry $registry)
     {
@@ -67,81 +76,124 @@ class Storage
 
     public function persist(Metrics $metrics): void
     {
-        $namespace = $metrics->namespace();
-        $memory    = $metrics->memoryUsage();
-        $labels    = $metrics->labels()->all();
-        $counters  = $metrics->counters()->all();
-        $timers    = $metrics->runtime()->allInSeconds();
-
-        $this->persistRequests($namespace, $labels);
-        $this->persistMemoryUsage($namespace, $labels, $memory);
-        $this->persistCounters($namespace, $counters);
-        $this->persistTimers($namespace, $labels, $timers);
+        $this->persistRequestsCounter($metrics);
+        $this->persistStatusesCounter($metrics);
+        $this->persistMemoryUsage($metrics);
+        $this->persistEventCounters($metrics);
+        $this->persistTimers($metrics);
+        $this->persistTimersTotal($metrics);
     }
 
-    private function persistMemoryUsage(string $namespace, array $labels, int $value): void
+    private function persistRequestsCounter(Metrics $metrics): void
     {
-        $memoryUsage = $this->registry->getOrRegisterGauge(
-            $namespace,
-            "http_memory_usage_total",
+        $labels = $metrics->labels()->with([
+            'route'  => $metrics->httpRoute(), 
+            'method' => $metrics->httpMethod()
+        ]);
+
+        $counter = $this->registry->getOrRegisterCounter(
+            $metrics->namespace(),
+            'http_requests_total',
+            'Total HTTP requests processed',
+            array_keys($labels)
+        );
+
+        $counter->inc($labels);
+    }
+
+    private function persistStatusesCounter(Metrics $metrics): void
+    {
+        $labels = $metrics->labels()->with([
+            'route'  => $metrics->httpRoute(),
+            'status' => $metrics->httpStatus()
+        ]);
+
+        $counter = $this->registry->getOrRegisterCounter(
+            $metrics->namespace(),
+            'http_statuses_total',
+            'Total HTTP response statuses',
+            array_keys($labels)
+        );
+
+        $counter->inc($labels);
+    }
+    
+    private function persistMemoryUsage(Metrics $metrics): void
+    {
+        $labels = $metrics->labels()->with([
+            'route' => $metrics->httpRoute()
+        ]);
+
+        $gauge = $this->registry->getOrRegisterGauge(
+            $metrics->namespace(),
+            "http_memory_usage_bytes",
             "Memory usage of bytes",
             array_keys($labels)
         );
 
-        $memoryUsage->set($value, $labels);
+        $gauge->set($metrics->memoryUsage(), $labels);
     }
 
-    private function persistRequests(string $namespace, array $labels): void
+    private function persistTimers(Metrics $metrics): void
     {
-        $requests = $this->registry->getOrRegisterCounter(
-            $namespace,
-            'http_requests_total',
-            'Total HTTP requests processed by the Yazoo',
+        $labels = $metrics->labels()->with([
+            'route' => $metrics->httpRoute()
+        ]);
+
+        $labelKeys = array_keys($labels) + ['timer'];
+
+        foreach ($metrics->runtime()->allInSeconds() as $name => $value) {
+            $gauge = $this->registry->getOrRegisterGauge(
+                $metrics->namespace(),
+                "http_runtime_seconds",
+                "HTTP request rutime in seconds",
+                $labelKeys
+            );
+            $gauge->set($value, $labels + ['timer' => $name]);
+        }
+
+        $result['total'] = \array_sum($result);
+    }
+
+    private function persistTimersTotal(Metrics $metrics): void
+    {
+        $labels = $metrics->labels()->with([
+            'route' => $metrics->httpRoute()
+        ]);
+
+        $gauge = $this->registry->getOrRegisterGauge(
+            $metrics->namespace(),
+            "http_runtime_seconds_total",
+            "HTTP request rutime total in seconds",
             array_keys($labels)
         );
 
-        $requests->inc($labels);
+        $value = \array_sum($metrics->runtime()->allInSeconds());
+        
+        $gauge->set($value, $labels);
     }
 
-    private function persistTimers(string $namespace, array $labels, array $timers): void
+    private function persistEventCounters(Metrics $metrics): void
     {
-        if (! $timers) {
-            return;
-        }
+        if (($counters = $metrics->counters()->all())) {
 
-        $labelNames = array_keys($labels);
+            $labels = $metrics->labels();
+            $labelKeys = array_keys($labels);
 
-        foreach ($timers as $name => $value) {
-            if ($value) {
-                $timer = $this->registry->getOrRegisterGauge(
-                    $namespace,
-                    "http_runtime_{$name}",
-                    "{$name} runtime in microseconds",
-                    $labelNames
-                );
-                $timer->set($value, $labels);
+            foreach ($counters as $name => $value) {
+                if ($value) {
+                    $counter = $this->registry->getOrRegisterCounter(
+                        $metrics->namespace(),
+                        "{$name}_total",
+                        "Count of {$name} event",
+                        $labelKeys
+                    );
+                    $counter->incBy($value, $labels);
+                }
             }
         }
     }
 
-    private function persistCounters(string $namespace, array $counters): void
-    {
-        if (! $counters) {
-            return;
-        }
-
-        foreach ($counters as $name => $value) {
-            if ($value) {
-                $counter = $this->registry->getOrRegisterCounter(
-                    $namespace,
-                    "{$name}_total",
-                    "Count of {$name}"
-                );
-                $counter->incBy($value);
-            }
-        }
-    }
-    
     public function fetch(): string
     {
         $samples = $this->registry->getMetricFamilySamples();
