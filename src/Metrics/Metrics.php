@@ -23,7 +23,7 @@ class Metrics
 
     /**
      * @param int $startTime Application start time in nanoseconds
-     * @param array $labels Additional labels (app node etc)
+     * @param array $labels Additional global labels (node, server etc)
      */
     public function __construct(
         int $startTime, 
@@ -33,16 +33,6 @@ class Metrics
         $this->labels   = new Labels($labels);
         $this->counters = new Counters();
     }
-
-//    public function initStorage(Storage $storage): void
-//    {
-//        $this->storage = $storage;
-//
-//        register_shutdown_function(function() {
-//            $this->beforePersist();
-//            $this->storage->persist($this);
-//        });
-//    }
 
     public function initStorage(Storage $storage): void
     {
@@ -122,13 +112,4 @@ class Metrics
     {
         return \memory_get_usage(false);
     }
-
-//    /**
-//     * Called before persisting the metrics
-//     * 
-//     * @return void
-//     */
-//    public function beforePersist(): void
-//    {
-//    }
 }

@@ -54,22 +54,21 @@ class Runtime
             $this->timers[$timer] = 0;
         }
 
-        $finishedAt = $this->stop();
-
+        $this->stop();
         $this->timer = $timer;
-        $this->timerStartedAt = $finishedAt;
     }
 
     /**
      * Stop active timer
      * @return int
      */
-    private function stop(): int
+    private function stop(): void
     {
-        $time = hrtime(true);
-        $this->timers[$this->timer] += ($time - $this->timerStartedAt);
+        $finishedAt = hrtime(true);
 
-        return $time;
+        $this->timers[$this->timer] += ($finishedAt - $this->timerStartedAt);
+
+        $this->timerStartedAt = $finishedAt;
     }
 
     public function spent(string $timer, int $nanoseconds): void

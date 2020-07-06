@@ -113,22 +113,6 @@ class MetricsTest extends TestCase
         $this->assertEquals($startedAt, $metrics->runtime()->timerStartedAt());
     }
 
-    public function test_runtime_total()
-    {
-        $metrics = $this->metrics(1000);
-
-        $metrics->startPhp();
-        usleep(1000);
-
-        $metrics->startMongo();
-        usleep(1000);
-
-        $timers = $metrics->runtime()->allInMilliseconds(0);
-
-        $this->assertArrayHasKey('total', $timers);
-        $this->assertEquals(3, $timers['total']);
-    }
-
     public function test_runtime_spent()
     {
         $metrics = $this->metrics();
@@ -143,7 +127,6 @@ class MetricsTest extends TestCase
         $this->assertEquals(10, $timers['mongo']);
 
         $this->assertEqualsWithDelta(40, $timers['php'], 2);
-        $this->assertEqualsWithDelta(50, $timers['total'], 2);
     }
 
     public function test_runtime_init_spent()
@@ -159,7 +142,6 @@ class MetricsTest extends TestCase
         $this->assertEquals(10, $timers['mongo']);
 
         $this->assertEqualsWithDelta(40, $timers['php_init'], 2);
-        $this->assertEqualsWithDelta(50, $timers['total'], 2);
         $this->assertArrayNotHasKey('php', $timers);
     }
 

@@ -137,10 +137,11 @@ class Storage
     private function persistTimers(Metrics $metrics): void
     {
         $labels = $metrics->labels()->with([
-            'route' => $metrics->httpRoute()
+            'route' => $metrics->httpRoute(),
+            'timer' => null,
         ]);
 
-        $labelKeys = array_keys($labels) + ['timer'];
+        $labelKeys = array_keys($labels);
 
         foreach ($metrics->runtime()->allInSeconds() as $name => $value) {
             $gauge = $this->registry->getOrRegisterGauge(
@@ -149,10 +150,9 @@ class Storage
                 "HTTP request rutime in seconds",
                 $labelKeys
             );
-            $gauge->set($value, $labels + ['timer' => $name]);
+            $labels['timer'] = $name;
+            $gauge->set($value, $labels);
         }
-
-        $result['total'] = \array_sum($result);
     }
 
     private function persistTimersTotal(Metrics $metrics): void
@@ -177,7 +177,7 @@ class Storage
     {
         if (($counters = $metrics->counters()->all())) {
 
-            $labels = $metrics->labels();
+            $labels = $metrics->labels()->all();
             $labelKeys = array_keys($labels);
 
             foreach ($counters as $name => $value) {
