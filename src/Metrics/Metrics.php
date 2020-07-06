@@ -5,6 +5,9 @@ namespace Metrics;
 use Metrics\Counters;
 use Metrics\Labels;
 use Metrics\Runtime;
+use Metrics\Storage;
+use Metrics\Debug;
+use Psr\Log\LoggerInterface;
 
 class Metrics
 {
@@ -13,6 +16,7 @@ class Metrics
     private $labels;
     private $runtime;
     private $counters;
+    private $storage;
 
     /**
      * @param int $startTime Application start time in nanoseconds
@@ -22,6 +26,30 @@ class Metrics
         $this->runtime  = new Runtime($startTime);
         $this->labels   = new Labels($labels);
         $this->counters = new Counters();
+    }
+
+    public function initStorage(Storage $storage): void
+    {
+        $this->storage = $storage;
+
+        register_shutdown_function(function() {
+            $this->beforePersist();
+            $this->storage->persist($this);
+        });
+    }
+
+    public function initDebug(LoggerInterface $logger): void
+    {
+        $debug = new Debug($logger);
+
+        register_shutdown_function(function() use ($debug) {
+            $debug->toLog($this);
+        });
+    }
+
+    public function storage(): Storage
+    {
+        return $this->storage;
     }
 
     public function startPhp(): void

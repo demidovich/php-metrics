@@ -8,21 +8,16 @@ use Prometheus\RenderTextFormat;
 use Prometheus\Storage\APC;
 use Prometheus\Storage\InMemory;
 use Prometheus\Storage\Redis;
-use Psr\Log\LoggerInterface;
 use RuntimeException;
 
 class Storage
 {
     private $registry;
-    private $metrics;
     private $logger;
 
-    public function __construct(CollectorRegistry $registry, Metrics $metrics)
+    public function __construct(CollectorRegistry $registry)
     {
         $this->registry = $registry;
-        $this->metrics  = $metrics;
-
-        register_shutdown_function([$this, 'persist']);
     }
 
     /**
@@ -32,7 +27,7 @@ class Storage
      * @return \self
      * @throws RuntimeException
      */
-    public static function create(string $adapter, array $redisConfig, Metrics $metrics): self
+    public static function create(string $adapter, array $redisConfig = []): self
     {
         switch ($adapter) {
             case 'redis':
@@ -52,7 +47,7 @@ class Storage
 
         $registry = new CollectorRegistry($adapter);
 
-        return new self($registry, $metrics);
+        return new self($registry);
     }
 
     private static function redisAdapter(array $config): Redis
@@ -70,38 +65,18 @@ class Storage
         return new Redis($config + $defaults);
     }
 
-    public function debug(LoggerInterface $logger): void
+    public function persist(Metrics $metrics): void
     {
-        $this->logger = $logger;
-    }
-
-    public function persist(): void
-    {
-        $this->metrics->beforePersist();
-
-        $namespace = $this->metrics->namespace();
-        $memory    = $this->metrics->memoryUsage();
-        $labels    = $this->metrics->labels()->all();
-        $counters  = $this->metrics->counters()->all();
-        $timers    = $this->metrics->runtime()->allInSeconds();
+        $namespace = $metrics->namespace();
+        $memory    = $metrics->memoryUsage();
+        $labels    = $metrics->labels()->all();
+        $counters  = $metrics->counters()->all();
+        $timers    = $metrics->runtime()->allInSeconds();
 
         $this->persistRequests($namespace, $labels);
         $this->persistMemoryUsage($namespace, $labels, $memory);
         $this->persistCounters($namespace, $counters);
         $this->persistTimers($namespace, $labels, $timers);
-
-        if ($this->logger) {
-            $debug  = PHP_EOL;
-            $debug .= "#" . PHP_EOL;
-            $debug .= "# {$namespace} metrics" . PHP_EOL;
-            $debug .= "#" . PHP_EOL;
-            $debug .= "memory: " . round($memory / (1024 * 1024), 2) . 'Mb' . PHP_EOL;
-            $debug .= "labels: " . print_r($labels, true) . PHP_EOL;
-            $debug .= "timers: " . print_r($timers, true) . PHP_EOL;
-            $debug .= "counters: " . print_r($counters, true) . PHP_EOL;
-            $debug .= PHP_EOL;
-            $this->logger->info($debug);
-        }
     }
 
     private function persistMemoryUsage(string $namespace, array $labels, int $value): void

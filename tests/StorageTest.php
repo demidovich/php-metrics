@@ -34,55 +34,60 @@ class StorageTest extends TestCase
 
     public function test_constructor()
     {
-        $registry = new CollectorRegistry(
-            new InMemory()
-        );
-
         $storage = new Storage(
-            $registry,
-            $this->metrics()
+            new CollectorRegistry(
+                new InMemory()
+            )        
         );
 
-        $this->asserts($storage);
+        $metrics = $this->metrics();
+        $metrics->initStorage($storage);
+
+        $this->asserts($metrics, $storage);
     }
 
     public function test_inmemory()
     {
-        $metrics = $this->metrics();
-        $storage = Storage::create('in-memory', [], $metrics);
+        $storage = Storage::create('in-memory');
 
-        $this->asserts($storage);
+        $metrics = $this->metrics();
+        $metrics->initStorage($storage);
+
+        $this->asserts($metrics, $storage);
     }
 
     public function test_apc()
     {
-        $metrics = $this->metrics();
-        $storage = Storage::create('apc', [], $metrics);
+        $storage = Storage::create('apc');
 
-        $this->asserts($storage);
+        $metrics = $this->metrics();
+        $metrics->initStorage($storage);
+
+        $this->asserts($metrics, $storage);
     }
 
     public function test_redis()
     {
-        $metrics = $this->metrics();
         $host    = isset($_SERVER['REDIS_HOST']) ? $_SERVER['REDIS_HOST'] : '127.0.0.1';
-        $storage = Storage::create('redis', ['host' => $host], $metrics);
+        $storage = Storage::create('redis', ['host' => $host]);
 
-        $this->asserts($storage);
+        $metrics = $this->metrics();
+        $metrics->initStorage($storage);
+
+        $this->asserts($metrics, $storage);
     }
 
     public function test_invalid_adapter()
     {
         $this->expectExceptionMessageMatches("/^Invalid CollectorRegistry adapter/i");
 
-        Storage::create('incorrect-adapter', [], $this->metrics());
+        Storage::create('incorrect-adapter', []);
     }
 
-    private function asserts(Storage $storage)
+    private function asserts(AppMetrics $metrics, Storage $storage)
     {
-        $this->assertInstanceOf(Storage::class, $storage);
+        $storage->persist($metrics);
 
-        $storage->persist();
         $persisted = $storage->fetch();
 
         $this->assertStringContainsString('route="myroute"', $persisted);
@@ -96,20 +101,5 @@ class StorageTest extends TestCase
         $this->assertStringContainsString('myapp_http_runtime_php_init',    $persisted);
         $this->assertStringContainsString('myapp_http_runtime_total',       $persisted);
         $this->assertStringContainsString('myapp_signin_attempt_total',     $persisted);
-    }
-
-    public function test_debug()
-    {
-        $logger = $this->createMock(LoggerInterface::class);
-
-        $logger->expects($this->at(0))
-            ->method('info')
-            ->with($this->stringContains('metrics'));
-
-        $metrics = $this->metrics();
-        $storage = Storage::create('in-memory', [], $metrics);
-        $storage->debug($logger);
-
-        $storage->persist();
     }
 }
