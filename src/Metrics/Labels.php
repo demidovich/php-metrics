@@ -8,14 +8,7 @@ class Labels
 
     public function __construct(array $labels)
     {
-        foreach ($labels as $name => $value) {
-            $this->set($name, $value);
-        }
-    }
-
-    public function set(string $name, $value): void
-    {
-        $this->labels[$name] = $value;
+        $this->labels = $labels;
     }
 
     public function all(): array
