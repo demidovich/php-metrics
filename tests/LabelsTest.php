@@ -9,7 +9,9 @@ class LabelsTest extends TestCase
 {
     public function test_construct()
     {
-        $instance = new Labels(['node' => '10.0.0.1']);
+        $instance = new Labels([
+            'node' => '10.0.0.1'
+        ]);
 
         $values = $instance->all();
 
@@ -19,12 +21,13 @@ class LabelsTest extends TestCase
 
     public function test_append_labels()
     {
-        $instance = new Labels(['node' => '10.0.0.1']);
+        $instance = new Labels([
+            'node' => '10.0.0.1'
+        ]);
 
-        $values = $instance->with(['timer' => 'php']);
-
-        $this->assertArrayHasKey('node', $values);
-        $this->assertEquals('10.0.0.1', $values['node']);
+        $values = $instance->allWith([
+            'timer' => 'php'
+        ]);
 
         $this->assertArrayHasKey('node', $values);
         $this->assertEquals('10.0.0.1', $values['node']);

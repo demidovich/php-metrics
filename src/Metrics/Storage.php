@@ -86,7 +86,7 @@ class Storage
 
     private function persistRequestsCounter(Metrics $metrics): void
     {
-        $labels = $metrics->labels()->with([
+        $labels = $metrics->labels()->allWith([
             'route'  => $metrics->httpRoute(), 
             'method' => $metrics->httpMethod()
         ]);
@@ -103,7 +103,7 @@ class Storage
 
     private function persistStatusesCounter(Metrics $metrics): void
     {
-        $labels = $metrics->labels()->with([
+        $labels = $metrics->labels()->allWith([
             'route'  => $metrics->httpRoute(),
             'status' => $metrics->httpStatus()
         ]);
@@ -120,7 +120,7 @@ class Storage
     
     private function persistMemoryUsage(Metrics $metrics): void
     {
-        $labels = $metrics->labels()->with([
+        $labels = $metrics->labels()->allWith([
             'route' => $metrics->httpRoute()
         ]);
 
@@ -136,7 +136,7 @@ class Storage
 
     private function persistTimers(Metrics $metrics): void
     {
-        $labels = $metrics->labels()->with([
+        $labels = $metrics->labels()->allWith([
             'route' => $metrics->httpRoute(),
             'timer' => null,
         ]);
@@ -157,7 +157,7 @@ class Storage
 
     private function persistTimersTotal(Metrics $metrics): void
     {
-        $labels = $metrics->labels()->with([
+        $labels = $metrics->labels()->allWith([
             'route' => $metrics->httpRoute()
         ]);
 

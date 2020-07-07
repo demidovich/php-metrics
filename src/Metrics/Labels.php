@@ -16,7 +16,7 @@ class Labels
         return $this->labels;
     }
 
-    public function with(array $labels): array
+    public function allWith(array $labels): array
     {
         return $this->labels + $labels;
     }
