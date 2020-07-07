@@ -3,57 +3,82 @@
 define('APP_START_TIME', hrtime(true));
 
 require __DIR__.'/../vendor/autoload.php';
+require __DIR__.'/AppMetrics.php';
 
-$metric = new MyMetrics(APP_START_TIME, [
-    'route'  => 'my-route',
-    'method' => 'get',
-    'host'   => '10.0.0.1',
-]);
+$metrics = new AppMetrics(APP_START_TIME, ['app_node' => '10.0.0.1']);
+$metrics->initStorage(
+    Metrics\Storage::create('redis', ['host' => 'redis'])
+);
 
-$storage = Metrics\Storage::create('in-memory', [], $metric);
-
-// PHP initialization is complete.
+// PHP initialization completed
 // Start of business logic 
-$metric->startPhp();
+$metrics->startPhp();
 
-if ($_SERVER['REQUEST_URI'] == '/metrics') {
-    echo exportMetricsHandler($metric);
-} else {
-    echo appHandler($metric);
+switch ($_SERVER['REQUEST_URI']) {
+
+    case '/':
+        $metrics->setHttpMethod('get');
+        $metrics->setHttpRoute('index@index');
+        echo 'index';
+        $metrics->setHttpStatus(200);
+        break;
+
+    case '/books':
+        $metrics->setHttpMethod('get');
+        $metrics->setHttpRoute('api.books@read');
+        echo appApiResourceReadHandler($metrics);
+        $metrics->setHttpStatus(200);
+        break;
+
+    case '/metrics':
+        $metrics->setHttpMethod('get');
+        $metrics->setHttpRoute('metrics');
+        header("Content-Type: text/plain");
+        echo exportMetricsHandler($metrics);
+        $metrics->setHttpStatus(200);
+        break;
+
+    default:
+        $metrics->setHttpMethod('get');
+        $metrics->setHttpRoute('error');
+        $metrics->setHttpStatus(404);
+
 }
 
-function appHandler(MyMetrics $metric)
+function appApiResourceReadHandler(AppMetrics $metrics)
 {
     // Register runtime for redis query
-    $metric->startRedis();
+    $metrics->startRedis();
     usleep(1000);
 
     // Some business logic
-    $metric->startPhp();
+    $metrics->startPhp();
     usleep(1000);
 
     // Register runtime for remote call
-    $metric->startRemoteCall();
+    $metrics->startRemoteCall();
     usleep(1000);
 
     // Some business logic
-    $metric->startPhp();
+    $metrics->startPhp();
     usleep(1000);
 
     // Adding the spent time
     // E.g. inside the database query event
     // These 500 microseconds will be subtracted from the 1000 microseconds 
     // of the current php tracking
-    $metric->spentSql(500);
+    $metrics->spentSql(500);
 
     // Register a business logic event
-    $metric->registerSigninAttempt();
+    $metrics->registerSigninAttempt();
 
     // If Metrics\Storage has been initialized all metrics will be persisted 
     // with register_shutdown_function()
+
+    return 'books';
 }
 
-function exportMetricsHandler(Metrics\Storage $storage)
+function exportMetricsHandler(AppMetrics $metrics)
 {
-    echo $storage->fetch();
+    echo $metrics->storage()->fetch();
 }

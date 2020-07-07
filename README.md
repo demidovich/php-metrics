@@ -2,3 +2,22 @@
 
 ## php metrics
 
+Install
+
+```
+make up
+./composer install
+```
+
+Visit
+
+```
+http://localhost:8090/
+http://localhost:8090/books
+```
+
+Check metrics
+
+```
+http://localhost:8090/metrics
+```

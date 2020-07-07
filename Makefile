@@ -15,6 +15,9 @@ ps: ## Status of containers
 log: ## Output log of containers
 	@docker-compose -f docker-compose.yml logs --follow --tail 1
 
+nginx: ## Shell of nginx container
+	docker-compose -f docker-compose.yml exec nginx /bin/sh
+
 php: ## Shell of php container
 	@docker-compose -f docker-compose.yml exec php /bin/bash
 
