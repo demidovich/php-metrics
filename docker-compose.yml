@@ -1,6 +1,26 @@
 version: "3"
 services:
 
+  nginx:
+    build:
+      context: ./
+      dockerfile: docker/nginx.Dockerfile
+      args:
+        UID: 1000
+        GID: 1000
+    image: "php-metrics-nginx"
+    container_name: "php-metrics-nginx"
+    ports:
+      - "8090:8080"
+    volumes:
+      - ./:/app
+    networks:
+      - "docker_network"
+    links:
+      - php
+    depends_on:
+      - php
+
   php:
     build:
       context: ./
