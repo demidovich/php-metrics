@@ -10,14 +10,14 @@ class AppMetrics extends Metrics
     protected $namespace = 'myapp';
 
     /**
-     * Register spent time from laravel database query event
+     * Register spent time from database query event or etc
      * 
-     * @param int $milliseconds
+     * @param int $microseconds
      * @return void
      */
-    public function spentSql(int $milliseconds): void
+    public function spentSql(int $microseconds): void
     {
-        $this->runtime()->spent('sql', (int) $milliseconds * 1e6);
+        $this->runtime()->spent('sql', (int) $microseconds * 1000);
     }
 
     /**
