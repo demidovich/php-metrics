@@ -40,21 +40,17 @@ class MetricsTest extends TestCase
         $this->assertEquals('myapp', $metrics->namespace());
     }
 
-    public function test_labels()
+    public function test_construct_labels()
     {
         $initLabels = [
-            'route'  => 'my.route',
-            'method' => 'get',
+            'node' => '10.0.0.1',
         ];
 
         $metrics = $this->metrics(null, $initLabels);
         $labels  = $metrics->labels()->all();
 
-        $this->assertArrayHasKey('route', $labels);
-        $this->assertArrayHasKey('method', $labels);
-
-        $this->assertEquals($initLabels['route'], $labels['route']);
-        $this->assertEquals($initLabels['method'], $labels['method']);
+        $this->assertArrayHasKey('node', $labels);
+        $this->assertEquals($initLabels['node'], $labels['node']);
     }
 
     public function test_memory_usage()
