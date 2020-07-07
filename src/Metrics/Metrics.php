@@ -13,9 +13,9 @@ class Metrics
 {
     protected $namespace = 'app';
 
-    private $httpRoute  = 'none';
-    private $httpMethod = 'get';
-    private $httpStatus = 200;
+    private $httpRoute  = 'undefined';
+    private $httpMethod = 'undefined';
+    private $httpStatus = 0;
     private $labels;
     private $runtime;
     private $counters;

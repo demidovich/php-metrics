@@ -16,7 +16,12 @@ class MetricsTest extends TestCase
             usleep($initMicroseconds);
         }
 
-        return new AppMetrics($startTime, $labels);
+        $metrics = new AppMetrics($startTime, $labels);
+        $metrics->setHttpMethod('get');
+        $metrics->setHttpRoute('api.resourse@read');
+        $metrics->setHttpStatus(200);
+
+        return $metrics;
     }
 
     public function test_init_storage()
@@ -165,5 +170,32 @@ class MetricsTest extends TestCase
 
         $this->assertArrayHasKey('signin_attempt', $couners);
         $this->assertEquals(5, $couners['signin_attempt']);
+    }
+
+    public function test_http_method()
+    {
+        $metrics = $this->metrics();
+        $this->assertEquals('get', $metrics->httpMethod());
+
+        $metrics->setHttpMethod('post');
+        $this->assertEquals('post', $metrics->httpMethod());
+    }
+
+    public function test_http_route()
+    {
+        $metrics = $this->metrics();
+        $this->assertEquals('api.resourse@read', $metrics->httpRoute());
+
+        $metrics->setHttpRoute('api.resourse@update');
+        $this->assertEquals('api.resourse@update', $metrics->httpRoute());
+    }
+
+    public function test_http_status()
+    {
+        $metrics = $this->metrics();
+        $this->assertEquals(200, $metrics->httpStatus());
+
+        $metrics->setHttpStatus(500);
+        $this->assertEquals(500, $metrics->httpStatus());
     }
 }
