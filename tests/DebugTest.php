@@ -43,4 +43,12 @@ class DebugTest extends TestCase
         $debug = new Debug($logger);
         $debug->toLog($metrics);
     }
+
+    public function test_metric_debug_init()
+    {
+        $logger  = $this->createMock(LoggerInterface::class);
+        $metrics = $this->metrics();
+
+        $this->assertNull($metrics->initDebug($logger));
+    }
 }
