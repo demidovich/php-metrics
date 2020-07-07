@@ -7,20 +7,19 @@ use Tests\Stub\AppMetrics;
 use Metrics\Storage;
 use Prometheus\CollectorRegistry;
 use Prometheus\Storage\InMemory;
-use Psr\Log\LoggerInterface;
 
 class StorageTest extends TestCase
 {
-    private $labels = [
-        'route'  => 'myroute',
-        'method' => 'get',
-        'node'   => '10.0.0.1',
-    ];
-
     private function metrics(): AppMetrics
     {
-        $metrics = new AppMetrics(hrtime(true), $this->labels);
-        
+        $metrics = new AppMetrics(hrtime(true), [
+            'node' => '10.0.0.1',
+        ]);
+
+        $metrics->setHttpMethod('get');
+        $metrics->setHttpRoute('api.books@read');
+        $metrics->setHttpStatus(200);
+
         $metrics->startPhp();
         usleep(100);
         
@@ -90,8 +89,8 @@ class StorageTest extends TestCase
 
         $persisted = $storage->fetch();
 
-        $this->assertStringContainsString('route="myroute"', $persisted);
-        $this->assertStringContainsString('method="get"',    $persisted);
+        $this->assertStringContainsString('route="api.books@read"', $persisted);
+        $this->assertStringContainsString('method="get"', $persisted);
         $this->assertStringContainsString('node="10.0.0.1"', $persisted);
 
         $this->assertStringContainsString('myapp_http_memory_usage_bytes',    $persisted);
