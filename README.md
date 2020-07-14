@@ -23,6 +23,20 @@ http://localhost:8090/metrics
 ```
 
 ```
+# HELP app_http_duration_seconds Histogram of HTTP request duration
+# TYPE app_http_duration_seconds histogram
+app_http_duration_seconds_bucket{method="GET",status="200",le="0.01"} 155
+app_http_duration_seconds_bucket{method="GET",status="200",le="0.025"} 1482
+app_http_duration_seconds_bucket{method="GET",status="200",le="0.05"} 83757
+app_http_duration_seconds_bucket{method="GET",status="200",le="0.1"} 101800
+app_http_duration_seconds_bucket{method="GET",status="200",le="0.25"} 102859
+app_http_duration_seconds_bucket{method="GET",status="200",le="0.5"} 102934
+app_http_duration_seconds_bucket{method="GET",status="200",le="1"} 102935
+app_http_duration_seconds_bucket{method="GET",status="200",le="2.5"} 102935
+app_http_duration_seconds_bucket{method="GET",status="200",le="5"} 102935
+app_http_duration_seconds_bucket{method="GET",status="200",le="+Inf"} 102935
+app_http_duration_seconds_count{method="GET",status="200"} 102935
+app_http_duration_seconds_sum{method="GET",status="200"} 4344.31459800000001659
 # HELP myapp_http_memory_usage_bytes Memory usage of bytes
 # TYPE myapp_http_memory_usage_bytes gauge
 myapp_http_memory_usage_bytes{app_node="10.0.0.1",route="api.books@read"} 389944
