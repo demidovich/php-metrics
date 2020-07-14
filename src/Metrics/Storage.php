@@ -82,6 +82,7 @@ class Storage
         $this->persistEventCounters($metrics);
         $this->persistTimers($metrics);
         $this->persistTimersTotal($metrics);
+        $this->persistRequestDuration($metrics);
     }
 
     private function persistRequestsCounter(Metrics $metrics): void
@@ -171,6 +172,26 @@ class Storage
         $value = \array_sum($metrics->runtime()->allInSeconds());
         
         $gauge->set($value, $labels);
+    }
+
+    private function persistRequestDuration(Metrics $metrics): void
+    {
+        $labels = $metrics->labels()->allWith([
+            'method' => $metrics->httpMethod(),
+            'status' => $metrics->httpStatus()
+        ]);
+
+        $histogram = $this->registry->getOrRegisterHistogram(
+            $metrics->namespace(),
+            "http_duration_seconds",
+            "Histogram of HTTP request duration",
+            array_keys($labels),
+            [0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5]
+        );
+
+        $value = \array_sum($metrics->runtime()->allInSeconds());
+
+        $histogram->observe($value, $labels);
     }
 
     private function persistEventCounters(Metrics $metrics): void
