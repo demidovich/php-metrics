@@ -2,7 +2,9 @@
 
 ## php metrics
 
-Install
+Framework agnostic Prometheus metrics wrapper for PHP applications.
+
+Start containers and install vendors
 
 ```
 make up
