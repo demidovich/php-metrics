@@ -2,7 +2,7 @@
 
 ## php metrics
 
-Framework agnostic Prometheus metrics wrapper for PHP applications.
+This project is a framework agnostic simple library for monitoring PHP application in the Prometheus. 
 
 Start containers and install vendors
 
