@@ -21,6 +21,16 @@ class Metrics
     private $counters;
     private $storage;
 
+    // 512k 1M 1.5M 2M 2.5M 3M 3.5M 4M 4.5M 5M 10M 15M
+    protected $memoryUsageBuckets = [
+        524288,  1048576, 1572864, 2097152, 2621440, 3145728, 
+        3670016, 4194304, 4718592, 5242880, 10485760, 15728640
+    ];
+
+    protected $requestDurationBuckets = [
+        0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5
+    ];
+
     /**
      * @param int $startTime Application start time in nanoseconds
      * @param array $labels Additional global labels (node, server etc)
@@ -111,5 +121,15 @@ class Metrics
     public function memoryUsage(): int
     {
         return \memory_get_usage(false);
+    }
+
+    public function memoryUsageBuckets(): array
+    {
+        return $this->memoryUsageBuckets;
+    }
+
+    public function requestDurationBuckets(): array
+    {
+        return $this->requestDurationBuckets;
     }
 }

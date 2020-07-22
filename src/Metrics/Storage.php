@@ -11,14 +11,14 @@ use Prometheus\Storage\Redis;
 use RuntimeException;
 
 /**
- * Prometheus metrics:
+ * Metrics:
  * 
- * app_http_requests_total          (route, method, labels)     count
- * app_http_statuses_total          (route, status, labels)     count
- * app_http_memory_usage_bytes      (route, labels)             bytes
- * app_http_runtime_seconds_total   (route, labels)             seconds
- * app_http_runtime_seconds         (route, timer, labels)      seconds
- * app_signin_attempt_total         (lebels)                    count
+ * app_http_duration_seconds_bucket     (method, status, le, <labels>)
+ * app_http_memory_usage_bytes_bucket   (status, le, <labels>)
+ * app_http_memory_usage_bytes          (route, <labels>)
+ * app_http_requests_count              (route, status, <labels>)
+ * app_http_runtime_seconds             (route, timer, <labels>)
+ * yazoo_team_<counter>_count           (<labels>)
  */
 class Storage
 {
@@ -77,11 +77,9 @@ class Storage
     public function persist(Metrics $metrics): void
     {
         $this->persistRequestsCounter($metrics);
-        $this->persistStatusesCounter($metrics);
         $this->persistMemoryUsage($metrics);
         $this->persistEventCounters($metrics);
         $this->persistTimers($metrics);
-        $this->persistTimersTotal($metrics);
         $this->persistRequestDuration($metrics);
     }
 
@@ -89,30 +87,13 @@ class Storage
     {
         $labels = $metrics->labels()->allWith([
             'route'  => $metrics->httpRoute(), 
-            'method' => $metrics->httpMethod()
-        ]);
-
-        $counter = $this->registry->getOrRegisterCounter(
-            $metrics->namespace(),
-            'http_requests_total',
-            'Total HTTP requests processed',
-            array_keys($labels)
-        );
-
-        $counter->inc($labels);
-    }
-
-    private function persistStatusesCounter(Metrics $metrics): void
-    {
-        $labels = $metrics->labels()->allWith([
-            'route'  => $metrics->httpRoute(),
             'status' => $metrics->httpStatus()
         ]);
 
         $counter = $this->registry->getOrRegisterCounter(
             $metrics->namespace(),
-            'http_statuses_total',
-            'Total HTTP response statuses',
+            'http_requests_count',
+            'Count HTTP requests processed',
             array_keys($labels)
         );
 
@@ -121,6 +102,8 @@ class Storage
     
     private function persistMemoryUsage(Metrics $metrics): void
     {
+        $value = $metrics->memoryUsage();
+
         $labels = $metrics->labels()->allWith([
             'route' => $metrics->httpRoute()
         ]);
@@ -132,7 +115,21 @@ class Storage
             array_keys($labels)
         );
 
-        $gauge->set($metrics->memoryUsage(), $labels);
+        $gauge->set($value, $labels);
+
+        $labels = $metrics->labels()->allWith([
+            'status' => $metrics->httpStatus()
+        ]);
+
+        $histogram = $this->registry->getOrRegisterHistogram(
+            $metrics->namespace(),
+            "http_memory_usage_bytes",
+            "Histogram of HTTP memory usage in bytes",
+            array_keys($labels),
+            $metrics->memoryUsageBuckets()
+        );
+
+        $histogram->observe($value, $labels);
     }
 
     private function persistTimers(Metrics $metrics): void
@@ -156,24 +153,6 @@ class Storage
         }
     }
 
-    private function persistTimersTotal(Metrics $metrics): void
-    {
-        $labels = $metrics->labels()->allWith([
-            'route' => $metrics->httpRoute()
-        ]);
-
-        $gauge = $this->registry->getOrRegisterGauge(
-            $metrics->namespace(),
-            "http_runtime_seconds_total",
-            "HTTP request rutime total in seconds",
-            array_keys($labels)
-        );
-
-        $value = \array_sum($metrics->runtime()->allInSeconds());
-        
-        $gauge->set($value, $labels);
-    }
-
     private function persistRequestDuration(Metrics $metrics): void
     {
         $labels = $metrics->labels()->allWith([
@@ -186,7 +165,7 @@ class Storage
             "http_duration_seconds",
             "Histogram of HTTP request duration",
             array_keys($labels),
-            [0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5]
+            $metrics->requestDurationBuckets()
         );
 
         $value = \array_sum($metrics->runtime()->allInSeconds());
@@ -205,7 +184,7 @@ class Storage
                 if ($value) {
                     $counter = $this->registry->getOrRegisterCounter(
                         $metrics->namespace(),
-                        "{$name}_total",
+                        "{$name}_count",
                         "Count of {$name} event",
                         $labelKeys
                     );

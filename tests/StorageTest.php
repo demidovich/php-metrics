@@ -93,12 +93,11 @@ class StorageTest extends TestCase
         $this->assertStringContainsString('method="get"', $persisted);
         $this->assertStringContainsString('node="10.0.0.1"', $persisted);
 
-        $this->assertStringContainsString('myapp_http_memory_usage_bytes',      $persisted);
-        $this->assertStringContainsString('myapp_http_requests_total',          $persisted);
-        $this->assertStringContainsString('myapp_http_runtime_seconds',         $persisted);
-        $this->assertStringContainsString('myapp_http_runtime_seconds_total',   $persisted);
-        $this->assertStringContainsString('myapp_http_statuses_total',          $persisted);
-        $this->assertStringContainsString('myapp_signin_attempt_total',         $persisted);
         $this->assertStringContainsString('myapp_http_duration_seconds_bucket', $persisted);
+        $this->assertStringContainsString('myapp_http_memory_usage_bytes', $persisted);
+        $this->assertStringContainsString('myapp_http_memory_usage_bytes_bucket', $persisted);
+        $this->assertStringContainsString('myapp_http_requests_count', $persisted);
+        $this->assertStringContainsString('myapp_http_runtime_seconds', $persisted);
+        $this->assertStringContainsString('myapp_signin_attempt_count', $persisted);
     }
 }
