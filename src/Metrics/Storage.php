@@ -13,12 +13,12 @@ use RuntimeException;
 /**
  * Metrics:
  * 
- * app_http_duration_seconds_bucket     (method, status, le, <labels>)
- * app_http_memory_usage_bytes_bucket   (status, le, <labels>)
- * app_http_memory_usage_bytes          (route, <labels>)
- * app_http_requests_count              (route, status, <labels>)
- * app_http_runtime_seconds             (route, timer, <labels>)
- * yazoo_team_<counter>_count           (<labels>)
+ * <prefix>_http_duration_seconds_bucket     (status, le, <labels>)
+ * <prefix>_http_memory_usage_bytes_bucket   (status, le, <labels>)
+ * <prefix>_http_memory_usage_bytes          (route, <labels>)
+ * <prefix>_http_requests_count              (route, status, <labels>)
+ * <prefix>_http_runtime_seconds             (route, timer, <labels>)
+ * <prefix>_<counter>_count                  (<labels>)
  */
 class Storage
 {
@@ -77,6 +77,7 @@ class Storage
     public function persist(Metrics $metrics): void
     {
         $this->persistRequestsCounter($metrics);
+        // $this->persistMethodRequestsCounter($metrics);
         $this->persistMemoryUsage($metrics);
         $this->persistEventCounters($metrics);
         $this->persistTimers($metrics);
@@ -99,7 +100,24 @@ class Storage
 
         $counter->inc($labels);
     }
-    
+
+    // private function persistMethodRequestsCounter(Metrics $metrics): void
+    // {
+    //     $labels = $metrics->labels()->allWith([
+    //         'method' => $metrics->httpMethod(), 
+    //         'status' => $metrics->httpStatus()
+    //     ]);
+
+    //     $counter = $this->registry->getOrRegisterCounter(
+    //         $metrics->namespace(),
+    //         'http_method_requests_count',
+    //         'Count HTTP method requests processed',
+    //         array_keys($labels)
+    //     );
+
+    //     $counter->inc($labels);
+    // }
+
     private function persistMemoryUsage(Metrics $metrics): void
     {
         $value = $metrics->memoryUsage();
@@ -156,7 +174,6 @@ class Storage
     private function persistRequestDuration(Metrics $metrics): void
     {
         $labels = $metrics->labels()->allWith([
-            'method' => $metrics->httpMethod(),
             'status' => $metrics->httpStatus()
         ]);
 
