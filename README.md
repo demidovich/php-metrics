@@ -25,52 +25,49 @@ http://localhost:8090/metrics
 ```
 
 ```
-# HELP app_http_duration_seconds Histogram of HTTP request duration
-# TYPE app_http_duration_seconds histogram
-app_http_duration_seconds_bucket{method="GET",status="200",le="0.01"} 155
-app_http_duration_seconds_bucket{method="GET",status="200",le="0.025"} 1482
-app_http_duration_seconds_bucket{method="GET",status="200",le="0.05"} 83757
-app_http_duration_seconds_bucket{method="GET",status="200",le="0.1"} 101800
-app_http_duration_seconds_bucket{method="GET",status="200",le="0.25"} 102859
-app_http_duration_seconds_bucket{method="GET",status="200",le="0.5"} 102934
-app_http_duration_seconds_bucket{method="GET",status="200",le="1"} 102935
-app_http_duration_seconds_bucket{method="GET",status="200",le="2.5"} 102935
-app_http_duration_seconds_bucket{method="GET",status="200",le="5"} 102935
-app_http_duration_seconds_bucket{method="GET",status="200",le="+Inf"} 102935
-app_http_duration_seconds_count{method="GET",status="200"} 102935
-app_http_duration_seconds_sum{method="GET",status="200"} 4344.31459800000001659
+# HELP myapp_http_duration_seconds Histogram of HTTP request duration
+# TYPE myapp_http_duration_seconds histogram
+myapp_http_duration_seconds_bucket{node="10.0.0.1",status="200",le="0.01"} 1
+myapp_http_duration_seconds_bucket{node="10.0.0.1",status="200",le="0.025"} 1
+myapp_http_duration_seconds_bucket{node="10.0.0.1",status="200",le="0.05"} 1
+myapp_http_duration_seconds_bucket{node="10.0.0.1",status="200",le="0.1"} 1
+myapp_http_duration_seconds_bucket{node="10.0.0.1",status="200",le="0.25"} 1
+myapp_http_duration_seconds_bucket{node="10.0.0.1",status="200",le="0.5"} 1
+myapp_http_duration_seconds_bucket{node="10.0.0.1",status="200",le="1"} 1
+myapp_http_duration_seconds_bucket{node="10.0.0.1",status="200",le="2.5"} 1
+myapp_http_duration_seconds_bucket{node="10.0.0.1",status="200",le="5"} 1
+myapp_http_duration_seconds_bucket{node="10.0.0.1",status="200",le="+Inf"} 1
+myapp_http_duration_seconds_count{node="10.0.0.1",status="200"} 1
+myapp_http_duration_seconds_sum{node="10.0.0.1",status="200"} 0.003229
 # HELP myapp_http_memory_usage_bytes Memory usage of bytes
 # TYPE myapp_http_memory_usage_bytes gauge
-myapp_http_memory_usage_bytes{app_node="10.0.0.1",route="api.books@read"} 389944
-myapp_http_memory_usage_bytes{app_node="10.0.0.1",route="index@index"} 523664
-myapp_http_memory_usage_bytes{app_node="10.0.0.1",route="metrics"} 392384
-# HELP myapp_http_requests_total Total HTTP requests processed
-# TYPE myapp_http_requests_total counter
-myapp_http_requests_total{app_node="10.0.0.1",route="api.books@read",method="get"} 3
-myapp_http_requests_total{app_node="10.0.0.1",route="index@index",method="get"} 1
-myapp_http_requests_total{app_node="10.0.0.1",route="metrics",method="get"} 7
+myapp_http_memory_usage_bytes{node="10.0.0.1",route="api.books@read"} 5312296
+# HELP myapp_http_memory_usage_bytes Histogram of HTTP memory usage in bytes
+# TYPE myapp_http_memory_usage_bytes histogram
+myapp_http_memory_usage_bytes_bucket{node="10.0.0.1",status="200",le="524288"} 0
+myapp_http_memory_usage_bytes_bucket{node="10.0.0.1",status="200",le="1048576"} 0
+myapp_http_memory_usage_bytes_bucket{node="10.0.0.1",status="200",le="1572864"} 0
+myapp_http_memory_usage_bytes_bucket{node="10.0.0.1",status="200",le="2097152"} 0
+myapp_http_memory_usage_bytes_bucket{node="10.0.0.1",status="200",le="2621440"} 0
+myapp_http_memory_usage_bytes_bucket{node="10.0.0.1",status="200",le="3145728"} 0
+myapp_http_memory_usage_bytes_bucket{node="10.0.0.1",status="200",le="3670016"} 0
+myapp_http_memory_usage_bytes_bucket{node="10.0.0.1",status="200",le="4194304"} 0
+myapp_http_memory_usage_bytes_bucket{node="10.0.0.1",status="200",le="4718592"} 0
+myapp_http_memory_usage_bytes_bucket{node="10.0.0.1",status="200",le="5242880"} 0
+myapp_http_memory_usage_bytes_bucket{node="10.0.0.1",status="200",le="10485760"} 1
+myapp_http_memory_usage_bytes_bucket{node="10.0.0.1",status="200",le="15728640"} 1
+myapp_http_memory_usage_bytes_bucket{node="10.0.0.1",status="200",le="+Inf"} 1
+myapp_http_memory_usage_bytes_count{node="10.0.0.1",status="200"} 1
+myapp_http_memory_usage_bytes_sum{node="10.0.0.1",status="200"} 5312296
+# HELP myapp_http_requests_count Count HTTP requests processed
+# TYPE myapp_http_requests_count counter
+myapp_http_requests_count{node="10.0.0.1",route="api.books@read",status="200"} 1
 # HELP myapp_http_runtime_seconds HTTP request rutime in seconds
 # TYPE myapp_http_runtime_seconds gauge
-myapp_http_runtime_seconds{app_node="10.0.0.1",route="api.books@read",timer="php"} 0.005875
-myapp_http_runtime_seconds{app_node="10.0.0.1",route="api.books@read",timer="php_init"} 0.000506
-myapp_http_runtime_seconds{app_node="10.0.0.1",route="api.books@read",timer="redis"} 0.00108
-myapp_http_runtime_seconds{app_node="10.0.0.1",route="api.books@read",timer="remote_call"} 0.001154
-myapp_http_runtime_seconds{app_node="10.0.0.1",route="api.books@read",timer="sql"} 0.0005
-myapp_http_runtime_seconds{app_node="10.0.0.1",route="index@index",timer="php"} 0.006504
-myapp_http_runtime_seconds{app_node="10.0.0.1",route="index@index",timer="php_init"} 0.159591
-myapp_http_runtime_seconds{app_node="10.0.0.1",route="metrics",timer="php"} 0.003691
-myapp_http_runtime_seconds{app_node="10.0.0.1",route="metrics",timer="php_init"} 0.000421
-# HELP myapp_http_runtime_seconds_total HTTP request rutime total in seconds
-# TYPE myapp_http_runtime_seconds_total gauge
-myapp_http_runtime_seconds_total{app_node="10.0.0.1",route="api.books@read"} 0.011963
-myapp_http_runtime_seconds_total{app_node="10.0.0.1",route="index@index"} 0.167348
-myapp_http_runtime_seconds_total{app_node="10.0.0.1",route="metrics"} 0.005155
-# HELP myapp_http_statuses_total Total HTTP response statuses
-# TYPE myapp_http_statuses_total counter
-myapp_http_statuses_total{app_node="10.0.0.1",route="api.books@read",status="200"} 3
-myapp_http_statuses_total{app_node="10.0.0.1",route="index@index",status="200"} 1
-myapp_http_statuses_total{app_node="10.0.0.1",route="metrics",status="200"} 7
-# HELP myapp_signin_attempt_total Count of signin_attempt event
-# TYPE myapp_signin_attempt_total counter
-myapp_signin_attempt_total{app_node="10.0.0.1"} 3
+myapp_http_runtime_seconds{node="10.0.0.1",route="api.books@read",timer="mongo"} 0.002551
+myapp_http_runtime_seconds{node="10.0.0.1",route="api.books@read",timer="php"} 0.000185
+myapp_http_runtime_seconds{node="10.0.0.1",route="api.books@read",timer="php_init"} 2.7E-5
+# HELP myapp_signin_attempt_count Count of signin_attempt event
+# TYPE myapp_signin_attempt_count counter
+myapp_signin_attempt_count{node="10.0.0.1"} 1
 ```
