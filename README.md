@@ -74,4 +74,4 @@ myapp_signin_attempt_count{node="10.0.0.1"} 1
 
 Grafana dashboard
 
-![Grafana dashboard](https://github.com/demidovich/php-metrics/blob/master/grafana/dashboard.png)
+![Grafana dashboard](https://github.com/demidovich/php-metrics/blob/master/grafana/dashboard.png?raw=true)
