@@ -71,3 +71,7 @@ myapp_http_runtime_seconds{node="10.0.0.1",route="api.books@read",timer="php_ini
 # TYPE myapp_signin_attempt_count counter
 myapp_signin_attempt_count{node="10.0.0.1"} 1
 ```
+
+Grafana dashboard
+
+![Grafana dashboard](https://github.com/demidovich/php-metrics/blob/master/grafana/dashboard.png?raw=true)
