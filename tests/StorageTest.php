@@ -90,7 +90,6 @@ class StorageTest extends TestCase
         $persisted = $storage->fetch();
 
         $this->assertStringContainsString('route="api.books@read"', $persisted);
-        $this->assertStringContainsString('method="get"', $persisted);
         $this->assertStringContainsString('node="10.0.0.1"', $persisted);
 
         $this->assertStringContainsString('myapp_http_duration_seconds_bucket', $persisted);
