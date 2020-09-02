@@ -32,6 +32,7 @@ services:
     container_name: "php-metrics-php"
     volumes:
       - ./:/app
+      - ~/.composer/auth.json:/composer/auth.json
     links:
       - redis
     environment:
