@@ -21,7 +21,7 @@
     },
     "require": {
         "php": ">=7.3",
-        "endclothing/prometheus_client_php": "^1.0",
+        "endclothing/prometheus_client_php": "^1.0.2",
         "psr/log": "^1.1"
     },
     "require-dev": {
