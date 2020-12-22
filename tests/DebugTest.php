@@ -34,7 +34,8 @@ class DebugTest extends TestCase
     {
         $logger = $this->createMock(LoggerInterface::class);
 
-        $logger->expects($this->at(0))
+        $logger
+            ->expects($this->exactly(1))
             ->method('info')
             ->with($this->stringContains('metrics'));
 
