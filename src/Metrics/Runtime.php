@@ -62,7 +62,7 @@ class Runtime
      * Stop active timer
      * @return int
      */
-    private function stop(): void
+    public function stop(): void
     {
         $finishedAt = hrtime(true);
 
@@ -96,8 +96,6 @@ class Runtime
 
     private function timers(int $divider, int $precision): array
     {
-        $this->stop();
-
         $result = [];
         foreach ($this->timers as $name => $value) {
             $result[$name] = \round($value / $divider, $precision);

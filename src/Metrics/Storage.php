@@ -2,6 +2,7 @@
 
 namespace Metrics;
 
+use Illuminate\Support\Facades\Log;
 use Metrics\Metrics;
 use Prometheus\CollectorRegistry;
 use Prometheus\RenderTextFormat;
@@ -76,6 +77,8 @@ class Storage
 
     public function persist(Metrics $metrics): void
     {
+        $metrics->runtime()->stop();
+
         $this->persistRequestsCounter($metrics);
         // $this->persistMethodRequestsCounter($metrics);
         $this->persistMemoryUsage($metrics);
