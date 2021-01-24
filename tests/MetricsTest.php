@@ -65,36 +65,41 @@ class MetricsTest extends TestCase
     public function test_runtime_php_init()
     {
         $metrics = $this->metrics(1000);
+        $metrics->runtime()->stop();
+
         $timers = $metrics->runtime()->allInMilliseconds(0);
 
         $this->assertArrayHasKey('php_init', $timers);
-        $this->assertEquals(1, $timers['php_init']);
+        $this->assertGreaterThanOrEqual(1, $timers['php_init']);
+        $this->assertLessThanOrEqual(3, $timers['php_init']);
     }
 
     public function test_runtime_php()
     {
         $metrics = $this->metrics();
-
         $metrics->startPhp();
         usleep(1000);
+        $metrics->runtime()->stop();
 
         $timers = $metrics->runtime()->allInMilliseconds(0);
 
         $this->assertArrayHasKey('php', $timers);
-        $this->assertEquals(1, $timers['php']);
+        $this->assertGreaterThanOrEqual(1, $timers['php']);
+        $this->assertLessThanOrEqual(3, $timers['php']);
     }
 
     public function test_runtime_custom_timer()
     {
         $metrics = $this->metrics();
-
         $metrics->startMongo();
         usleep(1000);
+        $metrics->runtime()->stop();
 
         $timers = $metrics->runtime()->allInMilliseconds(0);
 
         $this->assertArrayHasKey('mongo', $timers);
-        $this->assertEquals(1, $timers['mongo']);
+        $this->assertGreaterThanOrEqual(1, $timers['mongo']);
+        $this->assertLessThanOrEqual(3, $timers['mongo']);
     }
 
     public function test_runtime_retry()
@@ -119,8 +124,8 @@ class MetricsTest extends TestCase
         $metrics = $this->metrics();
         $metrics->startPhp();
         usleep(50000);
-
         $metrics->spentMongo(10000);
+        $metrics->runtime()->stop();
 
         $timers = $metrics->runtime()->allInMilliseconds();
 
@@ -134,8 +139,8 @@ class MetricsTest extends TestCase
     {
         $metrics = $this->metrics();
         usleep(50000);
-
         $metrics->spentMongo(10000);
+        $metrics->runtime()->stop();
 
         $timers = $metrics->runtime()->allInMilliseconds(0);
 
