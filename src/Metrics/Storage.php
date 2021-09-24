@@ -2,7 +2,6 @@
 
 namespace Metrics;
 
-use Illuminate\Support\Facades\Log;
 use Metrics\Metrics;
 use Prometheus\CollectorRegistry;
 use Prometheus\RenderTextFormat;
