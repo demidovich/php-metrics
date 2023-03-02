@@ -22,4 +22,5 @@ Homestead.yaml
 .env
 composer.lock
 phpunit.xml
+.phpunit.cache
 .phpunit.result.cache
