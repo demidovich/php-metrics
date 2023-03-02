@@ -1,4 +1,4 @@
-FROM demidovich/php-fpm:7.4-alpine
+FROM demidovich/php-fpm:8.1-alpine
 
 ARG UID=82
 ARG GID=82
@@ -6,7 +6,7 @@ ARG GID=82
 ENV UID=${UID:-82} \
     GID=${GID:-82} \
     CONTAINER_ENVIRONMENT=${CONTAINER_ENVIRONMENT:-production} \
-    PHP_COMPOSER_VERSION=2.1.3
+    PHP_COMPOSER_VERSION=2.5.4
 
 COPY ./docker/php/www.conf /usr/local/etc/php-fpm.d/
 COPY ./docker/php/zz-options.ini /usr/local/etc/php/conf.d/
