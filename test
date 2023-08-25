@@ -1,10 +1,14 @@
 #!/bin/bash
 
-cd "$(dirname "$0")"
+cd $(dirname $0)
 
 TESTS_PATH=$@
 CONTAINER_ID=$(docker-compose -f docker-compose.yml ps -q php)
 
-docker exec -ti $CONTAINER_ID /app/vendor/bin/phpunit $TESTS_PATH
+# Если есть путь к тестам, меняем ^.*tests на /app/tests
 
+if [ ! -z "$TESTS_PATH" ]; then
+    TESTS_PATH="/app/tests$(echo $TESTS_PATH | perl -pe 's/^.*tests//g')"
+fi
 
+docker exec -ti $CONTAINER_ID /app/vendor/bin/phpunit --colors=always $TESTS_PATH
