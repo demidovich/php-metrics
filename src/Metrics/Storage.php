@@ -39,13 +39,13 @@ class Storage
     public static function create(string $adapter, array $redisConfig = []): self
     {
         switch ($adapter) {
-            case 'redis':
+            case "redis":
                 $adapter = self::redisAdapter($redisConfig);
                 break;
-            case 'apc':
+            case "apc":
                 $adapter = new APC();
                 break;
-            case 'in-memory':
+            case "in-memory":
                 $adapter = new InMemory();
                 break;
             default:
@@ -62,13 +62,13 @@ class Storage
     private static function redisAdapter(array $config): Redis
     {
         $defaults = [
-            'host' => '127.0.0.1',
-            'port' => 6379,
-            'password' => null,
-            'database' => 1,
-            'timeout'  => 1,
-            'read_timeout' => 1,
-            'persistent_connections' => false,
+            "host" => "127.0.0.1",
+            "port" => 6379,
+            "password" => null,
+            "database" => 1,
+            "timeout"  => 1,
+            "read_timeout" => 1,
+            "persistent_connections" => false,
         ];
 
         return new Redis($config + $defaults);
@@ -76,7 +76,7 @@ class Storage
 
     public function persist(Metrics $metrics): void
     {
-        $metrics->runtime()->stop();
+        $runtime = $metrics->runtime()->fetchResultsInSeconds();
 
         $this->persistRequestsCounter($metrics);
         // $this->persistMethodRequestsCounter($metrics);
@@ -89,43 +89,26 @@ class Storage
     private function persistRequestsCounter(Metrics $metrics): void
     {
         $labels = $metrics->labels()->allWith([
-            'route'  => $metrics->httpRoute(), 
-            'status' => $metrics->httpStatus()
+            "route"  => $metrics->httpRoute(), 
+            "status" => $metrics->httpStatus()
         ]);
 
         $counter = $this->registry->getOrRegisterCounter(
             $metrics->namespace(),
-            'http_requests_count',
-            'Count HTTP requests processed',
+            "http_requests_count",
+            "Count HTTP requests processed",
             array_keys($labels)
         );
 
         $counter->inc($labels);
     }
 
-    // private function persistMethodRequestsCounter(Metrics $metrics): void
-    // {
-    //     $labels = $metrics->labels()->allWith([
-    //         'method' => $metrics->httpMethod(), 
-    //         'status' => $metrics->httpStatus()
-    //     ]);
-
-    //     $counter = $this->registry->getOrRegisterCounter(
-    //         $metrics->namespace(),
-    //         'http_method_requests_count',
-    //         'Count HTTP method requests processed',
-    //         array_keys($labels)
-    //     );
-
-    //     $counter->inc($labels);
-    // }
-
     private function persistMemoryUsage(Metrics $metrics): void
     {
         $value = $metrics->memoryUsage();
 
         $labels = $metrics->labels()->allWith([
-            'route' => $metrics->httpRoute()
+            "route" => $metrics->httpRoute()
         ]);
 
         $gauge = $this->registry->getOrRegisterGauge(
@@ -138,7 +121,7 @@ class Storage
         $gauge->set($value, $labels);
 
         $labels = $metrics->labels()->allWith([
-            'status' => $metrics->httpStatus()
+            "status" => $metrics->httpStatus()
         ]);
 
         $histogram = $this->registry->getOrRegisterHistogram(
@@ -155,20 +138,21 @@ class Storage
     private function persistTimers(Metrics $metrics): void
     {
         $labels = $metrics->labels()->allWith([
-            'route' => $metrics->httpRoute(),
-            'timer' => null,
+            "route" => $metrics->httpRoute(),
+            "timer" => null,
         ]);
 
         $labelKeys = array_keys($labels);
 
-        foreach ($metrics->runtime()->allInSeconds() as $name => $value) {
+        $timers = $metrics->runtime()->fetchResultsInSeconds();
+        foreach ($timers as $name => $value) {
             $gauge = $this->registry->getOrRegisterGauge(
                 $metrics->namespace(),
                 "http_runtime_seconds",
                 "HTTP request rutime in seconds",
                 $labelKeys
             );
-            $labels['timer'] = $name;
+            $labels["timer"] = $name;
             $gauge->set($value, $labels);
         }
     }
@@ -176,7 +160,7 @@ class Storage
     private function persistRequestDuration(Metrics $metrics): void
     {
         $labels = $metrics->labels()->allWith([
-            'status' => $metrics->httpStatus()
+            "status" => $metrics->httpStatus()
         ]);
 
         $histogram = $this->registry->getOrRegisterHistogram(
@@ -187,7 +171,9 @@ class Storage
             $metrics->requestDurationBuckets()
         );
 
-        $value = \array_sum($metrics->runtime()->allInSeconds());
+        $value = \array_sum(
+            $metrics->runtime()->fetchResultsInSeconds()
+        );
 
         $histogram->observe($value, $labels);
     }

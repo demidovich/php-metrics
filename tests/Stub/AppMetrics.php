@@ -3,6 +3,7 @@
 namespace Tests\Stub;
 
 use Metrics\Metrics;
+use Metrics\Timer;
 
 class AppMetrics extends Metrics
 {
@@ -10,21 +11,23 @@ class AppMetrics extends Metrics
 
     public function startMongo(): void
     {
-        $this->runtime()->start('mongo');
+        $this->runtime()->start("mongo");
     }
 
     public function spentMongo(int $microseconds): void
     {
-        $this->runtime()->spent('mongo', $microseconds * 1000);
+        $timer = Timer::stoppedFromMicroseconds("mongo", $microseconds);
+
+        $this->runtime()->spent($timer);
     }
 
     public function registerSigninAttempt(int $quantity = 1): void
     {
-        $this->counters()->increase('signin_attempt', $quantity);
+        $this->counters()->increase("signin_attempt", $quantity);
     }
 
     public function registerSigninSuccess(): void
     {
-        $this->counters()->increase('signin_success');
+        $this->counters()->increase("signin_success");
     }
 }

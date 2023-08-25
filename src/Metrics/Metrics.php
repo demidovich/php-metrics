@@ -11,10 +11,10 @@ use Psr\Log\LoggerInterface;
 
 class Metrics
 {
-    protected $namespace = 'app';
+    protected $namespace = "app";
 
-    private $httpRoute  = 'undefined';
-    private $httpMethod = 'undefined';
+    private $httpRoute  = "undefined";
+    private $httpMethod = "undefined";
     private $httpStatus = 0;
     private $labels;
     private $runtime;
@@ -48,14 +48,14 @@ class Metrics
     {
         $this->storage = $storage;
 
-        register_shutdown_function([$storage, 'persist'], $this);
+        register_shutdown_function([$storage, "persist"], $this);
     }
 
     public function initDebug(LoggerInterface $logger): void
     {
         $debug = new Debug($logger);
 
-        register_shutdown_function([$debug, 'toLog'], $this);
+        register_shutdown_function([$debug, "toLog"], $this);
     }
 
     public function setHttpRoute(string $value): void

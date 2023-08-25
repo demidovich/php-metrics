@@ -1,13 +1,14 @@
 <?php
 
 use Metrics\Metrics;
+use Metrics\Timer;
 
 /**
  * Wrappers of your counters and timers
  */
 class AppMetrics extends Metrics
 {
-    protected $namespace = 'myapp';
+    protected $namespace = "myapp";
 
     /**
      * Register spent time from database query event or etc
@@ -17,7 +18,9 @@ class AppMetrics extends Metrics
      */
     public function spentSql(int $microseconds): void
     {
-        $this->runtime()->spent('sql', (int) $microseconds * 1000);
+        $timer = Timer::stoppedFromMicroseconds("sql", $microseconds);
+
+        $this->runtime()->spent($timer);
     }
 
     /**
@@ -27,7 +30,7 @@ class AppMetrics extends Metrics
      */
     public function startRedis(): void
     {
-        $this->runtime()->start('redis');
+        $this->runtime()->start("redis");
     }
 
     /**
@@ -37,7 +40,7 @@ class AppMetrics extends Metrics
      */
     public function startRemoteCall(): void
     {
-        $this->runtime()->start('remote_call');
+        $this->runtime()->start("remote_call");
     }
 
     /**
@@ -47,6 +50,6 @@ class AppMetrics extends Metrics
      */
     public function registerSigninAttempt(): void
     {
-        $this->counters()->increase('signin_attempt');
+        $this->counters()->increase("signin_attempt");
     }
 }
