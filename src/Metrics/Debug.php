@@ -7,7 +7,7 @@ use Psr\Log\LoggerInterface;
 
 class Debug
 {
-    private $logger;
+    private LoggerInterface $logger;
 
     public function __construct(LoggerInterface $logger)
     {

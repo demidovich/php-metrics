@@ -13,8 +13,8 @@ use RuntimeException;
 /**
  * Metrics:
  * 
- * <prefix>_http_duration_seconds_bucket     (status, le, <labels>)
- * <prefix>_http_memory_usage_bytes_bucket   (status, le, <labels>)
+ * <prefix>_http_duration_seconds_bucket     (le, <labels>)
+ * <prefix>_http_memory_usage_bytes_bucket   (le, <labels>)
  * <prefix>_http_memory_usage_bytes          (route, <labels>)
  * <prefix>_http_requests_count              (route, status, <labels>)
  * <prefix>_http_runtime_seconds             (route, timer, <labels>)
@@ -22,7 +22,7 @@ use RuntimeException;
  */
 class Storage
 {
-    private $registry;
+    private CollectorRegistry $registry;
 
     public function __construct(CollectorRegistry $registry)
     {
@@ -105,8 +105,7 @@ class Storage
 
     private function persistMemoryUsage(Metrics $metrics): void
     {
-        $value = $metrics->memoryUsage();
-
+        $value  = $metrics->memoryUsage();
         $labels = $metrics->labels()->allWith([
             "route" => $metrics->httpRoute()
         ]);
@@ -119,10 +118,7 @@ class Storage
         );
 
         $gauge->set($value, $labels);
-
-        $labels = $metrics->labels()->allWith([
-            "status" => $metrics->httpStatus()
-        ]);
+        $labels = $metrics->labels()->all();
 
         $histogram = $this->registry->getOrRegisterHistogram(
             $metrics->namespace(),
@@ -159,9 +155,7 @@ class Storage
 
     private function persistRequestDuration(Metrics $metrics): void
     {
-        $labels = $metrics->labels()->allWith([
-            "status" => $metrics->httpStatus()
-        ]);
+        $labels = $metrics->labels()->all();
 
         $histogram = $this->registry->getOrRegisterHistogram(
             $metrics->namespace(),

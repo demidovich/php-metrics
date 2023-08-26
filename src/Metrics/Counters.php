@@ -4,7 +4,7 @@ namespace Metrics;
 
 class Counters
 {
-    private $counters = [];
+    private array $counters = [];
 
     public function increase(string $name, int $quantity = 1): void
     {

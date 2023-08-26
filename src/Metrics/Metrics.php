@@ -11,23 +11,23 @@ use Psr\Log\LoggerInterface;
 
 class Metrics
 {
-    protected $namespace = "app";
+    protected string $namespace = "app";
 
-    private $httpRoute  = "undefined";
-    private $httpMethod = "undefined";
-    private $httpStatus = 0;
-    private $labels;
-    private $runtime;
-    private $counters;
-    private $storage;
+    private string   $httpRoute  = "undefined";
+    private string   $httpMethod = "undefined";
+    private int      $httpStatus = 0;
+    private Labels   $labels;
+    private Runtime  $runtime;
+    private Counters $counters;
+    private Storage  $storage;
 
     // 512k 1M 1.5M 2M 2.5M 3M 3.5M 4M 4.5M 5M 10M 15M
-    protected $memoryUsageBuckets = [
+    protected array $memoryUsageBuckets = [
         524288,  1048576, 1572864, 2097152, 2621440, 3145728, 
         3670016, 4194304, 4718592, 5242880, 10485760, 15728640
     ];
 
-    protected $requestDurationBuckets = [
+    protected array $requestDurationBuckets = [
         0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5
     ];
 
@@ -39,8 +39,8 @@ class Metrics
         int $startTime, 
         array $labels = []
     ) {
-        $this->runtime  = new Runtime($startTime);
         $this->labels   = new Labels($labels);
+        $this->runtime  = new Runtime($startTime);
         $this->counters = new Counters();
     }
 

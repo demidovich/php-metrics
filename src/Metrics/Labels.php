@@ -4,7 +4,7 @@ namespace Metrics;
 
 class Labels
 {
-    private $labels = [];
+    private array $labels = [];
 
     public function __construct(array $labels)
     {

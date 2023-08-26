@@ -7,7 +7,7 @@ use Metrics\Timer;
 
 class AppMetrics extends Metrics
 {
-    protected $namespace = "myapp";
+    protected string $namespace = "myapp";
 
     public function startMongo(): void
     {
