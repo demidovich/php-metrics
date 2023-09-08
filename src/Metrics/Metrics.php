@@ -120,7 +120,7 @@ class Metrics
 
     public function memoryUsage(): int
     {
-        return \memory_get_usage(false);
+        return \memory_get_peak_usage(true);
     }
 
     public function memoryUsageBuckets(): array

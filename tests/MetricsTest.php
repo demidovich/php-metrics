@@ -56,7 +56,7 @@ class MetricsTest extends TestCase
     {
         $metrics = $this->metrics();
 
-        $expected = \memory_get_usage(false);
+        $expected = \memory_get_peak_usage(true);
 
         $this->assertEqualsWithDelta($expected, $metrics->memoryUsage(), 500);
     }
